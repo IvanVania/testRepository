@@ -2,23 +2,34 @@
 
 function updateUI(data) {
     // Обновление фото профиля
-    document.getElementById('profile-pic').src = data.profilePicture;
+    if (data.profilePicture && data.profilePicture.S) {
+        document.getElementById('profile-pic').src = data.profilePicture.S;
+    }
 
     // Обновление количества кредитов
-    document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
+    if (data.credits && data.credits.N) {
+        document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
+    } else {
+        document.getElementById('credits').textContent = `Credits: 0`;
+    }
 
     // Обновление списка книг
     const chatList = document.getElementById('chat-list');
     chatList.innerHTML = '';
 
-    Object.entries(data.books).forEach(([bookTitle, bookId]) => {
-        const listItem = document.createElement('li');
-        listItem.textContent = bookTitle.slice(0, -5); // Обрезаем ID из названия
-        listItem.setAttribute('data-id', bookId);
-        listItem.onclick = () => openChatBook(bookId);
-        chatList.appendChild(listItem);
-    });
+    if (data.books && data.books.M) {
+        Object.entries(data.books.M).forEach(([bookTitle, bookData]) => {
+            if (bookData.S) {
+                const listItem = document.createElement('li');
+                listItem.textContent = bookTitle.replace(/_[a-z0-9]+$/, ''); // Убираем ID из названия
+                listItem.setAttribute('data-id', bookData.S);
+                listItem.onclick = () => openChatBook(bookData.S);
+                chatList.appendChild(listItem);
+            }
+        });
+    }
 }
+
 
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
