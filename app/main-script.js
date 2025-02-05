@@ -34,7 +34,7 @@ window.onload = function () {
         headers['Authorization'] = `Bearer ${jwtToken}`;
     }
 
-    fetch('https://oa3oqxa8wf.execute-api.us-east-2.amazonaws.com/default/', {
+    fetch('https://vjydgrki9a.execute-api.us-east-2.amazonaws.com/default/', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(payload)
