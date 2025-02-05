@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiscBook AI</title>
+    <link rel="icon" href="/logo.svg" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .login-container, .loading-container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .login-container {
+            display: none; 
+        }
+        .login-container h1 {
+            margin-bottom: 20px;
+        }
+        .login-btn {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .login-btn:hover {
+            background-color: #357ae8;
+        }
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4285F4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container" id="loading-container">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="login-container" id="login-container">
+        <h1>Welcome to DiscBook AI</h1>
+        <button class="login-btn" onclick="startGoogleAuth()">Login with Google</button>
+    </div>
+
+    <script>
+        // 
+        async function checkAuthStatus() {
+            const apiEndpoint = 'https://imm63s55gb.execute-api.us-east-2.amazonaws.com/default/checkAuthLogInPage';
+            const accessToken = localStorage.getItem('jwtToken');
+            const requestHeaders = {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + accessToken
+            };
+
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'GET',
+                    headers: requestHeaders
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.isAuthenticated) {
+                        window.location.href = 'https://thedisc.xyz/app';
+                    } else {
+                        //  
+                        localStorage.removeItem('jwtToken');
+                        document.getElementById('loading-container').style.display = 'none'; //  
+                        document.getElementById('login-container').style.display = 'block'; //  
+                    }
+                } else {
+                    // 
+                    localStorage.removeItem('jwtToken');
+                    document.getElementById('loading-container').style.display = 'none'; // 
+                    document.getElementById('login-container').style.display = 'block'; //  
+                }
+            } catch (error) {
+                console.error('Ошибка при проверке статуса аутентификации:', error);
+                localStorage.removeItem('jwtToken'); // 
+                document.getElementById('loading-container').style.display = 'none'; //  
+                document.getElementById('login-container').style.display = 'block'; // 
+            }
+        }
+
+        //  
+        function startGoogleAuth() {
+            const clientId = '473956107015-uaivpkmbdivg4unooq2mmqgat34npcbf.apps.googleusercontent.com';
+            const redirectUri = 'https://thedisc.xyz/app';
+            const scope = 'email profile';
+            const authUrl = `https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}`;
+            window.location.href = authUrl;
+        }
+
+        //  
+        window.onload = checkAuthStatus;
+    </script>
+</body>
+</html>
