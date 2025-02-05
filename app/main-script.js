@@ -1,3 +1,94 @@
+
+
+function updateUI(data) {
+    // Обновление фото профиля
+    document.getElementById('profile-pic').src = data.profilePicture;
+
+    // Обновление количества кредитов
+    document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
+
+    // Обновление списка книг
+    const chatList = document.getElementById('chat-list');
+    chatList.innerHTML = '';
+
+    Object.entries(data.books).forEach(([bookTitle, bookId]) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = bookTitle.slice(0, -5); // Обрезаем ID из названия
+        listItem.setAttribute('data-id', bookId);
+        listItem.onclick = () => openChatBook(bookId);
+        chatList.appendChild(listItem);
+    });
+}
+
+window.onload = function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authorizationCode = urlParams.get('code');
+    const jwtToken = localStorage.getItem('jwtToken');
+
+    const payload = { code: authorizationCode || null };
+
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    if (jwtToken) {
+        headers['Authorization'] = `Bearer ${jwtToken}`;
+    }
+
+    fetch('https://t6ve4y65bj.execute-api.us-east-2.amazonaws.com/default/FetchDataUserLambda', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+            return;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            if (data.error === 'Authentication failed') {
+                window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+            }
+        } else {
+            if (data.accessToken) {
+                localStorage.setItem('jwtToken', data.accessToken);
+            }
+            updateUI(data.user); // 
+        }
+    })
+    .catch(error => {
+        console.error('Error executing request:', error);
+    });
+};
+
+function logout() {
+    localStorage.removeItem('jwtToken');
+    window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // navbar-component.js
 function createNavbar() {
     const navbar = document.createElement("div");
