@@ -102,7 +102,7 @@ window.onload = function () {
             if (data.accessToken) {
                 localStorage.setItem('jwtToken', data.accessToken);
             }
-            updateUI(data.user); // 
+            // updateUI(data.user); // 
         }
     })
     .catch(error => {
