@@ -33,6 +33,51 @@ function updateUI(data) {
 
 
 
+// window.onload = function () {
+//     const urlParams = new URLSearchParams(window.location.search);
+//     const authorizationCode = urlParams.get('code');
+//     const jwtToken = localStorage.getItem('jwtToken');
+
+//     const payload = { code: authorizationCode || null };
+
+//     const headers = {
+//         'Content-Type': 'application/json'
+//     };
+//     if (jwtToken) {
+//         headers['Authorization'] = `Bearer ${jwtToken}`;
+//     }
+
+//     fetch('https://vjydgrki9a.execute-api.us-east-2.amazonaws.com/default/', {
+//         method: 'POST',
+//         headers: headers,
+//         body: JSON.stringify(payload)
+//     })
+//     .then(response => {
+//         if (response.status === 401) {
+//             // window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+//             return;
+//         }
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! status: ${response.status}`);
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//         if (data.error) {
+//             if (data.error === 'Authentication failed') {
+//                 // window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+//             }
+//         } else {
+//             if (data.accessToken) {
+//                 localStorage.setItem('jwtToken', data.accessToken);
+//             }
+//             updateUI(data.user); // 
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error executing request:', error);
+//     });
+// };
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const authorizationCode = urlParams.get('code');
@@ -54,7 +99,8 @@ window.onload = function () {
     })
     .then(response => {
         if (response.status === 401) {
-            window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+            console.warn("❌ Ошибка 401 (неавторизован)");
+            // window.location.href = 'https://ivanvania.github.io/testRepository/login/';
             return;
         }
         if (!response.ok) {
@@ -63,21 +109,36 @@ window.onload = function () {
         return response.json();
     })
     .then(data => {
+        console.log("✅ Ответ от сервера:", data);
+
         if (data.error) {
             if (data.error === 'Authentication failed') {
-                window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+                console.warn("❌ Ошибка аутентификации");
+                // window.location.href = 'https://ivanvania.github.io/testRepository/login/';
             }
         } else {
             if (data.accessToken) {
+                console.log("🔑 Новый токен сохранён:", data.accessToken);
                 localStorage.setItem('jwtToken', data.accessToken);
             }
-            updateUI(data.user); // 
+
+            if (data.user) {
+                console.log("🛠 Вызов updateUI с данными:", data.user);
+                try {
+                    updateUI(data.user);
+                } catch (error) {
+                    console.error("❌ Ошибка внутри updateUI:", error);
+                }
+            } else {
+                console.warn("⚠️ Данных пользователя (data.user) нет в ответе сервера");
+            }
         }
     })
     .catch(error => {
-        console.error('Error executing request:', error);
+        console.error('❌ Ошибка выполнения запроса:', error);
     });
 };
+
 
 function logout() {
     localStorage.removeItem('jwtToken');
