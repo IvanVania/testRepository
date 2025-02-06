@@ -3,16 +3,16 @@ function updateUI(data) {
     console.log("Ответ от сервера:", data);
 
     // // Обновление фото профиля
-    // if (data.profilePicture && data.profilePicture.S) {
-    //     document.getElementById('profile-pic').src = data.profilePicture.S;
-    // }
+    if (data.profilePicture && data.profilePicture.S) {
+        document.getElementById('profile-pic').src = data.profilePicture.S;
+    }
 
-    // // Обновление количества кредитов
-    // if (data.credits && data.credits.N) {
-    //     document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
-    // } else {
-    //     document.getElementById('credits').textContent = `Credits: 0`;
-    // }
+    // Обновление количества кредитов
+    if (data.credits && data.credits.N) {
+        document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
+    } else {
+        document.getElementById('credits').textContent = `Credits: 0`;
+    }
 
     // // Обновление списка книг
     // const chatList = document.getElementById('chat-list');
@@ -31,13 +31,14 @@ function updateUI(data) {
     // }
 }
 
+
+
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const authorizationCode = urlParams.get('code');
     const jwtToken = localStorage.getItem('jwtToken');
 
     const payload = { code: authorizationCode || null };
-    console.log("Отправляемый payload:", payload);
 
     const headers = {
         'Content-Type': 'application/json'
@@ -46,47 +47,47 @@ window.onload = function () {
         headers['Authorization'] = `Bearer ${jwtToken}`;
     }
 
-    console.log("Отправляемые заголовки:", headers);
-
     fetch('https://vjydgrki9a.execute-api.us-east-2.amazonaws.com/default/', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(payload)
     })
     .then(response => {
-        console.log("Статус ответа:", response.status);
-        console.log("Заголовки ответа:", response.headers);
-
         if (response.status === 401) {
-            console.warn("Ошибка аутентификации, но редирект отключен.");
+            window.location.href = 'https://ivanvania.github.io/testRepository/login/';
             return;
         }
         if (!response.ok) {
-            console.error(`Ошибка HTTP! статус: ${response.status}`);
-            return response.text().then(text => { throw new Error(text || `HTTP error! status: ${response.status}`); });
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
-        console.log("Полученные данные:", data);
-
-        if (data?.error) {
-            console.warn("Ошибка в данных ответа:", data.error);
-            // if (data.error === 'Authentication failed') {
-            //     window.location.href = 'https://ivanvania.github.io/testRepository/login/';
-            // }
-        } else {
-            if (data?.accessToken) {
-                localStorage.setItem('jwtToken', data.accessToken);
-                console.log("Сохранен новый accessToken:", data.accessToken);
+        if (data.error) {
+            if (data.error === 'Authentication failed') {
+                window.location.href = 'https://ivanvania.github.io/testRepository/login/';
             }
-            // updateUI(data.user); // Закомментировано
+        } else {
+            if (data.accessToken) {
+                localStorage.setItem('jwtToken', data.accessToken);
+            }
+            updateUI(data.user); // 
         }
     })
     .catch(error => {
-        console.error('Ошибка выполнения запроса:', error);
+        console.error('Error executing request:', error);
     });
 };
+
+function logout() {
+    localStorage.removeItem('jwtToken');
+    window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+}
+
+
+
+
+
 
 
 function logout() {
@@ -170,6 +171,7 @@ function createRightSection() {
 
 function createCredits() {
     const credits = document.createElement("div");
+    credits.id = "credits";  //
     credits.style.display = "flex";
     credits.style.alignItems = "center";
     credits.style.padding = "8px 15px";
@@ -222,6 +224,7 @@ function createProfileContainer() {
     profileContainer.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
 
     const profileImg = document.createElement("img");
+    profileImg.id = "profile-pic";  //
     profileImg.src = "https://via.placeholder.com/45";
     profileImg.style.width = "100%";
     profileImg.style.height = "100%";
