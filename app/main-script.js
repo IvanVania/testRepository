@@ -151,12 +151,6 @@ function logout() {
 
 
 
-function logout() {
-    localStorage.removeItem('jwtToken');
-    window.location.href = 'https://ivanvania.github.io/testRepository/login/';
-}
-
-
 
 
 
@@ -311,19 +305,23 @@ function createLogoutButton() {
     logoutBtn.style.fontWeight = "600";
     logoutBtn.style.transition = "all 0.3s ease";
     logoutBtn.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
-    
+
     logoutBtn.onmouseover = () => {
         logoutBtn.style.transform = "translateY(-2px)";
         logoutBtn.style.boxShadow = "0 4px 15px rgba(0,0,0,0.2)";
     };
-    
+
     logoutBtn.onmouseout = () => {
         logoutBtn.style.transform = "translateY(0)";
         logoutBtn.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
     };
-    
+
+    // Добавляем обработчик клика для вызова logout()
+    logoutBtn.onclick = logout;
+
     return logoutBtn;
 }
+
 
 
 
