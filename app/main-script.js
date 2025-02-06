@@ -972,6 +972,7 @@ function openChatBook(bookId) {
 }
 
 // Функция создания области чата с учётом состояния книги
+// Функция создания области чата с учётом состояния книги
 function createChatAreaWithState(bookData, bookState) {
     const chatArea = document.createElement("div");
     chatArea.style.flex = "1";
@@ -982,7 +983,19 @@ function createChatAreaWithState(bookData, bookState) {
 
     // Область для сообщений – для вставки плана и прочих сообщений
     const messagesArea = createMessagesArea();
+    messagesArea.id = "chat-messages-area"; // Добавляем id для поиска
     messagesArea.classList.add("messages-area");
+
+    // Если в bookData присутствует план, добавляем его как сообщение
+    if (bookData.plan) {
+        const planMessage = document.createElement("div");
+        planMessage.id = "chat-plan"; // Для удобства поиска, если понадобится
+        planMessage.style.padding = "10px 20px";
+        planMessage.style.marginBottom = "10px";
+        planMessage.style.borderBottom = "1px solid #e2e8f0";
+        planMessage.textContent = bookData.plan;
+        messagesArea.appendChild(planMessage);
+    }
 
     // Разделитель между сообщениями и панелью ввода/интерактивным блоком
     const divider = createDivider();
@@ -1001,7 +1014,7 @@ function createChatAreaWithState(bookData, bookState) {
             inputPanel = createInputPanel5(messagesArea);
             break;
         default:
-            inputPanel = createInputPanel(messagesArea); // Начальное состояние (если state === null)
+            inputPanel = createInputPanel(messagesArea); // Если state === null или другое значение
     }
 
     chatArea.appendChild(messagesArea);
@@ -1010,6 +1023,7 @@ function createChatAreaWithState(bookData, bookState) {
 
     return chatArea;
 }
+
 
 
 
