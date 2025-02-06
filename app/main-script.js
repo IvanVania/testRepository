@@ -1,35 +1,4 @@
 
-
-// function updateUI(data) {
-//     // Обновление фото профиля
-//     if (data.profilePicture && data.profilePicture.S) {
-//         document.getElementById('profile-pic').src = data.profilePicture.S;
-//     }
-
-//     // Обновление количества кредитов
-//     if (data.credits && data.credits.N) {
-//         document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
-//     } else {
-//         document.getElementById('credits').textContent = `Credits: 0`;
-//     }
-
-//     // Обновление списка книг
-//     const chatList = document.getElementById('chat-list');
-//     chatList.innerHTML = '';
-
-//     if (data.books && data.books.M) {
-//         Object.entries(data.books.M).forEach(([bookTitle, bookData]) => {
-//             if (bookData.S) {
-//                 const listItem = document.createElement('li');
-//                 listItem.textContent = bookTitle.replace(/_[a-z0-9]+$/, ''); // Убираем ID из названия
-//                 listItem.setAttribute('data-id', bookData.S);
-//                 listItem.onclick = () => openChatBook(bookData.S);
-//                 chatList.appendChild(listItem);
-//             }
-//         });
-//     }
-// }
-
 function updateUI(data) {
     console.log("Ответ от сервера:", data);
 
@@ -62,14 +31,13 @@ function updateUI(data) {
     // }
 }
 
-
-
 window.onload = function () {
     const urlParams = new URLSearchParams(window.location.search);
     const authorizationCode = urlParams.get('code');
     const jwtToken = localStorage.getItem('jwtToken');
 
     const payload = { code: authorizationCode || null };
+    console.log("Отправляемый payload:", payload);
 
     const headers = {
         'Content-Type': 'application/json'
@@ -78,37 +46,48 @@ window.onload = function () {
         headers['Authorization'] = `Bearer ${jwtToken}`;
     }
 
+    console.log("Отправляемые заголовки:", headers);
+
     fetch('https://vjydgrki9a.execute-api.us-east-2.amazonaws.com/default/', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(payload)
     })
     .then(response => {
+        console.log("Статус ответа:", response.status);
+        console.log("Заголовки ответа:", response.headers);
+
         if (response.status === 401) {
-            window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+            console.warn("Ошибка аутентификации, но редирект отключен.");
             return;
         }
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            console.error(`Ошибка HTTP! статус: ${response.status}`);
+            return response.text().then(text => { throw new Error(text || `HTTP error! status: ${response.status}`); });
         }
         return response.json();
     })
     .then(data => {
-        if (data.error) {
-            if (data.error === 'Authentication failed') {
-                window.location.href = 'https://ivanvania.github.io/testRepository/login/';
-            }
+        console.log("Полученные данные:", data);
+
+        if (data?.error) {
+            console.warn("Ошибка в данных ответа:", data.error);
+            // if (data.error === 'Authentication failed') {
+            //     window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+            // }
         } else {
-            if (data.accessToken) {
+            if (data?.accessToken) {
                 localStorage.setItem('jwtToken', data.accessToken);
+                console.log("Сохранен новый accessToken:", data.accessToken);
             }
-            // updateUI(data.user); // 
+            // updateUI(data.user); // Закомментировано
         }
     })
     .catch(error => {
-        console.error('Error executing request:', error);
+        console.error('Ошибка выполнения запроса:', error);
     });
 };
+
 
 function logout() {
     localStorage.removeItem('jwtToken');
