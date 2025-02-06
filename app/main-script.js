@@ -1,34 +1,67 @@
 
 
+// function updateUI(data) {
+//     // Обновление фото профиля
+//     if (data.profilePicture && data.profilePicture.S) {
+//         document.getElementById('profile-pic').src = data.profilePicture.S;
+//     }
+
+//     // Обновление количества кредитов
+//     if (data.credits && data.credits.N) {
+//         document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
+//     } else {
+//         document.getElementById('credits').textContent = `Credits: 0`;
+//     }
+
+//     // Обновление списка книг
+//     const chatList = document.getElementById('chat-list');
+//     chatList.innerHTML = '';
+
+//     if (data.books && data.books.M) {
+//         Object.entries(data.books.M).forEach(([bookTitle, bookData]) => {
+//             if (bookData.S) {
+//                 const listItem = document.createElement('li');
+//                 listItem.textContent = bookTitle.replace(/_[a-z0-9]+$/, ''); // Убираем ID из названия
+//                 listItem.setAttribute('data-id', bookData.S);
+//                 listItem.onclick = () => openChatBook(bookData.S);
+//                 chatList.appendChild(listItem);
+//             }
+//         });
+//     }
+// }
+
 function updateUI(data) {
-    // Обновление фото профиля
-    if (data.profilePicture && data.profilePicture.S) {
-        document.getElementById('profile-pic').src = data.profilePicture.S;
-    }
+    console.log("Ответ от сервера:", data);
 
-    // Обновление количества кредитов
-    if (data.credits && data.credits.N) {
-        document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
-    } else {
-        document.getElementById('credits').textContent = `Credits: 0`;
-    }
+    // // Обновление фото профиля
+    // if (data.profilePicture && data.profilePicture.S) {
+    //     document.getElementById('profile-pic').src = data.profilePicture.S;
+    // }
 
-    // Обновление списка книг
-    const chatList = document.getElementById('chat-list');
-    chatList.innerHTML = '';
+    // // Обновление количества кредитов
+    // if (data.credits && data.credits.N) {
+    //     document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
+    // } else {
+    //     document.getElementById('credits').textContent = `Credits: 0`;
+    // }
 
-    if (data.books && data.books.M) {
-        Object.entries(data.books.M).forEach(([bookTitle, bookData]) => {
-            if (bookData.S) {
-                const listItem = document.createElement('li');
-                listItem.textContent = bookTitle.replace(/_[a-z0-9]+$/, ''); // Убираем ID из названия
-                listItem.setAttribute('data-id', bookData.S);
-                listItem.onclick = () => openChatBook(bookData.S);
-                chatList.appendChild(listItem);
-            }
-        });
-    }
+    // // Обновление списка книг
+    // const chatList = document.getElementById('chat-list');
+    // chatList.innerHTML = '';
+
+    // if (data.books && data.books.M) {
+    //     Object.entries(data.books.M).forEach(([bookTitle, bookData]) => {
+    //         if (bookData.S) {
+    //             const listItem = document.createElement('li');
+    //             listItem.textContent = bookTitle.replace(/_[a-z0-9]+$/, ''); // Убираем ID из названия
+    //             listItem.setAttribute('data-id', bookData.S);
+    //             listItem.onclick = () => openChatBook(bookData.S);
+    //             chatList.appendChild(listItem);
+    //         }
+    //     });
+    // }
 }
+
 
 
 window.onload = function () {
