@@ -526,11 +526,15 @@ function createNewBookButton() {
 
     // При нажатии открывается область для создания книги
     btn.onclick = () => {
-        openNewChatArea();
+        openNewChatArea(); //new chat 
     };
 
     return btn;
 }
+
+
+
+
 
 // Функция открытия области для создания новой книги (пример)
 function openNewChatArea() {
@@ -547,6 +551,33 @@ function createNewBookChatArea() {
     // Добавьте нужную логику и стили
     return area;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* ----- Секция для LIST view (динамическое обновление списка книг) ----- */
@@ -840,13 +871,13 @@ function createBookItem(bookData) {
     dropdown.appendChild(deleteBtn);
     book.appendChild(dropdown);
     
-    book.onclick = () => openChatBook(bookData.id);
+    book.onclick = () => openBookChatArea(bookData.id);
     
     return book;
 }
 
 // Функция обновления интерфейса на основе данных с сервера
-function updateUI(data) {
+function updateUI(data) { //???
     console.log("Ответ от сервера:", data);
 
     // Обновление фото профиля
@@ -896,91 +927,90 @@ function addNewBook(booksList, bookData) {
 
 
 
+// Функция открытия области для создания новой книги
+function openBookChatArea(bookId) {
+    const chatAreaContainer = document.getElementById("chat-area-container");
+    chatAreaContainer.innerHTML = "";
+    openChatBook(bookId);
+}
 
-function openChatBook(bookId) { //create chat area
-  // Находим контейнер центральной области (предполагается, что он является вторым дочерним элементом main-container)
-  const mainContainer = document.getElementById("main-container");
-  // Второй дочерний элемент – это область для чата (или initial screen)
-  const chatContainer = mainContainer.children[1];
-  chatContainer.innerHTML = ""; // очищаем старое содержимое
-  
-  // Запускаем индикатор загрузки (предполагается, что переменная loadingIndicator доступна глобально)
-  window.loadingIndicator.startLoading();
-  
-  // Делаем POST‑запрос к API
-  fetch('https://g8qyy5fxc0.execute-api.us-east-2.amazonaws.com/default/', {
-    method: 'POST',
-    headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` 
-    },
-    body: JSON.stringify({ bookId: bookId })
-  })
+// Функция загрузки данных книги и обновления интерфейса
+function openChatBook(bookId) {
+    // Запускаем индикатор загрузки
+    window.loadingIndicator.startLoading();
+
+    // Делаем POST-запрос к API
+    fetch('https://tbq9c4b34j.execute-api.us-east-2.amazonaws.com/default/', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` 
+        },
+        body: JSON.stringify({ bookId: bookId })
+    })
     .then(response => response.json())
     .then(bookData => {
-      // Останавливаем индикатор загрузки
-      window.loadingIndicator.stopLoading();
-      
-      // Создаём область чата, которая выбирается по состоянию (state) книги
-      const chatArea = createChatAreaWithState(bookData);
-      
-      // Добавляем план книги в начало области сообщений (если нужно)
-      const messagesArea = chatArea.querySelector('.messages-area');
-      if (messagesArea) {
-        const planMessage = document.createElement('div');
-        planMessage.style.padding = "10px 20px";
-        planMessage.style.marginBottom = "10px";
-        planMessage.style.borderBottom = "1px solid #e2e8f0";
-        planMessage.textContent = bookData.plan;
-        messagesArea.insertBefore(planMessage, messagesArea.firstChild);
-      }
-      
-      // Обновляем центральную область – вставляем созданное окно чата
-      chatContainer.innerHTML = "";
-      chatContainer.appendChild(chatArea);
+        // Останавливаем индикатор загрузки
+        window.loadingIndicator.stopLoading();
+
+        // Проверяем, есть ли состояние книги, если нет — используем стандартное
+        const bookState = bookData.state || "DEFAULT";
+
+        // Создаём область чата на основе состояния книги
+        const chatArea = createChatAreaWithState(bookData, bookState);
+
+        // Обновляем центральную область – вставляем созданное окно чата
+        const chatContainer = document.getElementById("chat-area-container");
+        chatContainer.innerHTML = "";
+        chatContainer.appendChild(chatArea);
     })
     .catch(error => {
-      window.loadingIndicator.stopLoading();
-      console.error("Ошибка API:", error);
-      chatContainer.innerHTML = "<p>Ошибка загрузки данных книги</p>";
+        window.loadingIndicator.stopLoading();
+        console.error("Ошибка API:", error);
+        document.getElementById("chat-area-container").innerHTML = "<p>Ошибка загрузки данных книги</p>";
     });
 }
-//
-function createChatAreaWithState(bookData) {
-  const chatArea = document.createElement("div");
-  chatArea.style.flex = "1";
-  chatArea.style.display = "flex";
-  chatArea.style.flexDirection = "column";
-  chatArea.style.height = "100%";
-  chatArea.style.backgroundColor = "#ffffff";
-  
-  // Область для сообщений – для вставки плана и прочих сообщений
-  const messagesArea = createMessagesArea();
-  messagesArea.classList.add("messages-area");
-  
-  // Разделитель между сообщениями и панелью ввода/интерактивным блоком
-  const divider = createDivider();
-  
-  let inputPanel;
-  if (bookData.state === 'START') {
-    // Например, запускаем функцию для отслеживания прогресса (если она нужна)
-    startProgressCheck(bookData.BookID);
-    inputPanel = createInputPanel3(messagesArea);
-  } else if (bookData.state === 'FINISHED') {
-    inputPanel = createInputPanel4(messagesArea);
-  } else if (bookData.state === 'ERROR') {
-    inputPanel = createInputPanel5(messagesArea);
-  } else {
-    // Если state неизвестен, можно использовать панель по умолчанию (например, UI1)
-    inputPanel = createInputPanel(messagesArea);
-  }
-  
-  chatArea.appendChild(messagesArea);
-  chatArea.appendChild(divider);
-  chatArea.appendChild(inputPanel);
-  
-  return chatArea;
+
+// Функция создания области чата с учётом состояния книги
+function createChatAreaWithState(bookData, bookState) {
+    const chatArea = document.createElement("div");
+    chatArea.style.flex = "1";
+    chatArea.style.display = "flex";
+    chatArea.style.flexDirection = "column";
+    chatArea.style.height = "100%";
+    chatArea.style.backgroundColor = "#ffffff";
+
+    // Область для сообщений – для вставки плана и прочих сообщений
+    const messagesArea = createMessagesArea();
+    messagesArea.classList.add("messages-area");
+
+    // Разделитель между сообщениями и панелью ввода/интерактивным блоком
+    const divider = createDivider();
+
+    // Выбор панели ввода на основе состояния книги
+    let inputPanel;
+    switch (bookState) {
+        case 'START':
+            startProgressCheck(bookData.BookID);
+            inputPanel = createInputPanel3(messagesArea);
+            break;
+        case 'FINISHED':
+            inputPanel = createInputPanel4(messagesArea);
+            break;
+        case 'ERROR':
+            inputPanel = createInputPanel5(messagesArea);
+            break;
+        default:
+            inputPanel = createInputPanel(messagesArea); // Начальное состояние (если state === null)
+    }
+
+    chatArea.appendChild(messagesArea);
+    chatArea.appendChild(divider);
+    chatArea.appendChild(inputPanel);
+
+    return chatArea;
 }
+
 
 
 
@@ -1187,7 +1217,7 @@ function createDivider() {
 
 
 
-//opent new Chat Book
+//opent new Chat Book// --- chat-area-container
 
 //2---createNewBook chat Area --- new chat area
 function createNewBookChatArea() { //  --- chat area
