@@ -2,14 +2,14 @@
 function updateUI(data) {
     console.log("Ответ от сервера:", data);
 
-    // // Обновление фото профиля
-    if (data.profilePicture && data.profilePicture.S) {
-        document.getElementById('profile-pic').src = data.profilePicture.S;
+    // Обновление фото профиля
+    if (data.profilePicture) {
+        document.getElementById('profile-pic').src = data.profilePicture;
     }
 
     // Обновление количества кредитов
-    if (data.credits && data.credits.N) {
-        document.getElementById('credits').textContent = `Credits: ${data.credits.N}`;
+    if (data.credits) {
+        document.getElementById('credits').textContent = `Credits: ${data.credits}`;
     } else {
         document.getElementById('credits').textContent = `Credits: 0`;
     }
