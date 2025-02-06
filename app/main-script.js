@@ -972,7 +972,6 @@ function openChatBook(bookId) {
 }
 
 // Функция создания области чата с учётом состояния книги
-// Функция для добавления сообщения (используется для отображения плана)
 function addMessage(messagesArea, text) {
     const message = document.createElement("div");
     message.style.padding = "15px";
@@ -982,6 +981,8 @@ function addMessage(messagesArea, text) {
     message.style.border = "1px solid #e2e8f0";
     message.style.fontSize = "14px";
     message.style.lineHeight = "1.5";
+    // Позволяет отображать переносы строк и пробелы
+    message.style.whiteSpace = "pre-wrap";
     message.textContent = text;
     
     messagesArea.appendChild(message);
