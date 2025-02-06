@@ -8,28 +8,29 @@ function updateUI(data) {
     }
 
     // Обновление количества кредитов
-    if (data.credits) {
-        document.getElementById('credits').textContent = `Credits: ${data.credits}`;
-    } else {
-        document.getElementById('credits').textContent = `Credits: 0`;
+    document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
+
+    // Обновление заголовка боковой панели (например, количества книг)
+    const headerSubtitle = document.querySelector('.sidebar-header-subtitle');
+    if (headerSubtitle) {
+        headerSubtitle.textContent = `${data.books.length} books`;
     }
 
-    // // Обновление списка книг
-    // const chatList = document.getElementById('chat-list');
-    // chatList.innerHTML = '';
+    // Обновление списка книг
+    const booksList = document.getElementById('books-list');
+    // Очищаем содержимое списка
+    booksList.innerHTML = '';
 
-    // if (data.books && data.books.M) {
-    //     Object.entries(data.books.M).forEach(([bookTitle, bookData]) => {
-    //         if (bookData.S) {
-    //             const listItem = document.createElement('li');
-    //             listItem.textContent = bookTitle.replace(/_[a-z0-9]+$/, ''); // Убираем ID из названия
-    //             listItem.setAttribute('data-id', bookData.S);
-    //             listItem.onclick = () => openChatBook(bookData.S);
-    //             chatList.appendChild(listItem);
-    //         }
-    //     });
-    // }
+    // Если данные с сервера содержат массив книг, создаем для каждой книги элемент и добавляем в список
+    if (data.books && Array.isArray(data.books)) {
+        data.books.forEach(book => {
+            // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
+            const bookItem = createBookItem(book);
+            booksList.appendChild(bookItem);
+        });
+    }
 }
+
 
 
 
@@ -338,25 +339,35 @@ function createLogoutButton() {
 
 
 // sidebar-component.js
-const sampleBooks = [
-    { id: 1, title: "The AI Revolution", category: "Science", lastEdited: "Just now" },
-    { id: 2, title: "Deep Learning Basics", category: "Technology", lastEdited: "2h ago" },
-    { id: 3, title: "Future of Computing", category: "Technology", lastEdited: "3h ago" },
-    { id: 4, title: "Quantum Physics", category: "Science", lastEdited: "5h ago" },
-    { id: 5, title: "Web Development", category: "Programming", lastEdited: "Yesterday" },
-    { id: 6, title: "Data Science", category: "Technology", lastEdited: "2 days ago" },
-    { id: 7, title: "Machine Learning", category: "AI", lastEdited: "3 days ago" },
-    { id: 8, title: "Python Mastery", category: "Programming", lastEdited: "4 days ago" },
-    { id: 9, title: "JavaScript Advanced", category: "Programming", lastEdited: "5 days ago" },
-    { id: 10, title: "Cybersecurity", category: "Technology", lastEdited: "1 week ago" },    
-    { id: 13, title: "Future of Computing", category: "Technology", lastEdited: "3h ago" },
-    { id: 14, title: "Quantum Physics", category: "Science", lastEdited: "5h ago" },
-    { id: 15, title: "Web Development", category: "Programming", lastEdited: "Yesterday" },
-    { id: 16, title: "Data Science", category: "Technology", lastEdited: "2 days ago" },
-    { id: 17, title: "Machine Learning", category: "AI", lastEdited: "3 days ago" },
-    { id: 18, title: "Python Mastery", category: "Programming", lastEdited: "4 days ago" },
-    { id: 19, title: "JavaScript Advanced", category: "Programming", lastEdited: "5 days ago" },
-    { id: 110, title: "Cybersecurity", category: "Technology", lastEdited: "1 week ago" },
+// const sampleBooks = [
+//     { id: 1, title: "The AI Revolution", category: "Science", lastEdited: "Just now" },
+//     { id: 2, title: "Deep Learning Basics", category: "Technology", lastEdited: "2h ago" },
+//     { id: 3, title: "Future of Computing", category: "Technology", lastEdited: "3h ago" },
+//     { id: 4, title: "Quantum Physics", category: "Science", lastEdited: "5h ago" },
+//     { id: 5, title: "Web Development", category: "Programming", lastEdited: "Yesterday" },
+//     { id: 6, title: "Data Science", category: "Technology", lastEdited: "2 days ago" },
+//     { id: 7, title: "Machine Learning", category: "AI", lastEdited: "3 days ago" },
+//     { id: 8, title: "Python Mastery", category: "Programming", lastEdited: "4 days ago" },
+//     { id: 9, title: "JavaScript Advanced", category: "Programming", lastEdited: "5 days ago" },
+//     { id: 10, title: "Cybersecurity", category: "Technology", lastEdited: "1 week ago" },    
+//     { id: 13, title: "Future of Computing", category: "Technology", lastEdited: "3h ago" },
+//     { id: 14, title: "Quantum Physics", category: "Science", lastEdited: "5h ago" },
+//     { id: 15, title: "Web Development", category: "Programming", lastEdited: "Yesterday" },
+//     { id: 16, title: "Data Science", category: "Technology", lastEdited: "2 days ago" },
+//     { id: 17, title: "Machine Learning", category: "AI", lastEdited: "3 days ago" },
+//     { id: 18, title: "Python Mastery", category: "Programming", lastEdited: "4 days ago" },
+//     { id: 19, title: "JavaScript Advanced", category: "Programming", lastEdited: "5 days ago" },
+//     { id: 110, title: "Cybersecurity", category: "Technology", lastEdited: "1 week ago" },
+// ];
+const sampleBooks2 = [
+    { id: '1730405052387-0.8575074708404704', title: 'AI Revolution', CreateDate: '2024-03-01T20:04:12.387Z', state: null },
+    { id: '1730405052388-0.9575074708404704', title: 'Deep Learning', CreateDate: '2024-03-01T18:04:12.387Z', state: 'START' },
+    { id: '1730405052389-0.7575074708404704', title: 'Machine Learning', CreateDate: '2024-02-28T20:04:12.387Z', state: 'FINISHED' },
+    { id: '1730405052390-0.6575074708404704', title: 'Neural Networks', CreateDate: '2024-02-27T20:04:12.387Z', state: 'ERROR' },
+    { id: '1730405052391-0.5575074708404704', title: 'Python Basics', CreateDate: '2024-02-25T20:04:12.387Z', state: null },
+    { id: '1730405052392-0.4575074708404704', title: 'Web Development', CreateDate: '2024-02-23T20:04:12.387Z', state: 'FINISHED' },
+    { id: '1730405052393-0.3575074708404704', title: 'Data Science', CreateDate: '2024-02-20T20:04:12.387Z', state: 'START' },
+    { id: '1730405052394-0.2575074708404704', title: 'Cybersecurity', CreateDate: '2024-02-15T20:04:12.387Z', state: 'ERROR' }
 ];
 
 
@@ -364,10 +375,7 @@ const sampleBooks = [
 
 
 
-
-
-
-//----
+// Функция создания боковой панели
 function createSidebar() {
     const sidebar = document.createElement("div");
     sidebar.style.width = "280px";
@@ -382,18 +390,19 @@ function createSidebar() {
 
     const header = createSidebarHeader();
     const booksList = createBooksList();
-    const newBookBtn = createNewBookButton(booksList);
+    // Присваиваем id контейнеру списка книг, чтобы потом можно было обновить его динамически
+    booksList.id = "books-list";
+    const newBookBtn = createNewBookButton();
 
     sidebar.appendChild(header);
     sidebar.appendChild(newBookBtn);
     sidebar.appendChild(booksList);
 
-    // Initialize with sample books
-    sampleBooks.forEach(book => addNewBook(booksList, book));
-
+    // Изначально список книг пуст (статические данные удалены)
     return sidebar;
 }
 
+// Заголовок боковой панели (будет обновляться динамически)
 function createSidebarHeader() {
     const header = document.createElement("div");
     header.style.marginBottom = "20px";
@@ -407,16 +416,20 @@ function createSidebarHeader() {
     title.style.margin = "0 0 5px 0";
 
     const subtitle = document.createElement("p");
-    subtitle.textContent = `${sampleBooks.length} books`;
+    // Изначально количество книг 0, после получения данных обновится через updateUI
+    subtitle.textContent = `0 books`;
     subtitle.style.fontSize = "13px";
     subtitle.style.color = "#64748b";
     subtitle.style.margin = "0";
+    // Для удобства обновления назначим класс
+    subtitle.className = "sidebar-header-subtitle";
 
     header.appendChild(title);
     header.appendChild(subtitle);
     return header;
 }
 
+// Контейнер для списка книг
 function createBooksList() {
     const booksList = document.createElement("div");
     booksList.style.marginTop = "20px";
@@ -444,17 +457,11 @@ function createBooksList() {
             border-radius: 3px;
         }
     `;
-
     return booksList;
 }
 
-
-
-
-
-// BOTTON 
-//create new book Bottom
-function createNewBookButton(booksList) {
+// Кнопка "Create New Book"
+function createNewBookButton() {
     const btn = document.createElement("button");
     btn.innerHTML = `
         <svg style="width: 18px; height: 18px; margin-right: 10px; filter: drop-shadow(0 2px 4px rgba(255,255,255,0.2));" 
@@ -465,7 +472,7 @@ function createNewBookButton(booksList) {
         Create New Book
     `;
     
-    // Add keyframes for pulse animation
+    // Добавляем keyframes для анимации
     const keyframes = `
         @keyframes pulseGlow {
             0% { box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25), 0 0 0 0 rgba(59, 130, 246, 0.4); }
@@ -477,7 +484,7 @@ function createNewBookButton(booksList) {
     style.textContent = keyframes;
     document.head.appendChild(style);
     
-    // Enhanced button styles
+    // Стили для кнопки
     btn.style.width = "100%";
     btn.style.padding = "14px 20px";
     btn.style.background = "linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #2563eb 100%)";
@@ -496,34 +503,28 @@ function createNewBookButton(booksList) {
     btn.style.overflow = "hidden";
     btn.style.letterSpacing = "0.3px";
     btn.style.textShadow = "0 2px 4px rgba(0,0,0,0.1)";
-
-    // Add shine effect
     btn.style.backgroundSize = "200% 200%";
     btn.style.animation = "gradient 5s ease infinite";
     
-    // Hover effects
+    // Hover эффекты
     btn.onmouseover = () => {
         btn.style.transform = "translateY(-2px) scale(1.02)";
         btn.style.boxShadow = "0 8px 25px rgba(59, 130, 246, 0.35)";
         btn.style.animation = "pulseGlow 2s infinite";
         btn.style.background = "linear-gradient(135deg, #4338ca 0%, #3b82f6 50%, #1d4ed8 100%)";
     };
-
-    // Mouse out effects
     btn.onmouseout = () => {
         btn.style.transform = "translateY(0) scale(1)";
         btn.style.boxShadow = "0 4px 12px rgba(59, 130, 246, 0.25)";
         btn.style.animation = "gradient 5s ease infinite";
         btn.style.background = "linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #2563eb 100%)";
     };
-
-    // Active state
     btn.onmousedown = () => {
         btn.style.transform = "translateY(1px) scale(0.98)";
         btn.style.boxShadow = "0 2px 8px rgba(59, 130, 246, 0.2)";
     };
 
-    // Click handler
+    // При нажатии открывается область для создания книги
     btn.onclick = () => {
         openNewChatArea();
     };
@@ -531,136 +532,297 @@ function createNewBookButton(booksList) {
     return btn;
 }
 
+// Функция открытия области для создания новой книги (пример)
 function openNewChatArea() {
-    // Ищем контейнер, где отображается область чата
     const chatAreaContainer = document.getElementById("chat-area-container");
-    // Очищаем текущее содержимое (например, стартовый экран)
     chatAreaContainer.innerHTML = "";
-    // Создаем новый чат для создания книги
     const newChatArea = createNewBookChatArea();
-    // Вставляем новый компонент в контейнер
     chatAreaContainer.appendChild(newChatArea);
 }
 
+// Здесь должна быть функция, создающая область для создания книги
+function createNewBookChatArea() {
+    const area = document.createElement("div");
+    area.textContent = "Создание новой книги...";
+    // Добавьте нужную логику и стили
+    return area;
+}
 
 
+/* ----- Секция для LIST view (динамическое обновление списка книг) ----- */
 
+const styles = {
+    bookItem: {
+        padding: '12px 16px',
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        cursor: 'pointer',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        border: '1px solid rgba(0, 0, 0, 0.05)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)',
+        position: 'relative',
+        width: '100%',
+        boxSizing: 'border-box',
+        marginBottom: '8px'
+    },
+    bookContent: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
+    },
+    topRow: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        gap: '12px',
+        minWidth: 0
+    },
+    titleContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        flex: '1 1 auto',
+        minWidth: '0'
+    },
+    title: {
+        fontSize: '14px',
+        fontWeight: '500',
+        color: '#334155',
+        wordBreak: 'break-word',
+        whiteSpace: 'normal',
+        overflow: 'visible',
+        lineHeight: '1.4'
+    },
+    metadata: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        flex: '0 0 auto',
+        minWidth: '0'
+    },
+    dateContainer: {
+        maxWidth: '70px',
+        minWidth: '0',
+        flex: '0 1 auto'
+    },
+    date: {
+        fontSize: '11px',
+        color: '#94a3b8',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
+    },
+    menuTrigger: {
+        cursor: 'pointer',
+        padding: '4px',
+        borderRadius: '4px',
+        transition: 'background-color 0.2s ease',
+        flex: '0 0 auto'
+    },
+    dropdownMenu: {
+        position: 'absolute',
+        right: '12px',
+        top: '30px',
+        background: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        padding: '6px',
+        display: 'none',
+        zIndex: 100,
+        border: '1px solid #e2e8f0',
+        minWidth: '150px'
+    },
+    deleteButton: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        padding: '8px 12px',
+        color: '#ef4444',
+        fontSize: '13px',
+        fontWeight: '500',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s ease'
+    },
+    statusIndicator: {
+        display: 'flex',
+        alignItems: 'center',
+        width: 'fit-content',
+        marginTop: '4px'
+    }
+};
 
+const STATUS_CONFIGS = {
+    FINISHED: {
+        background: 'rgba(34, 197, 94, 0.1)',
+        icon: `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M4 7l2 2 4-4" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`
+    },
+    START: {
+        background: 'rgba(59, 130, 246, 0.1)',
+        icon: `<div style="width: 8px; height: 8px; background: #3b82f6; border-radius: 50%;"></div>`
+    },
+    ERROR: {
+        background: 'rgba(239, 68, 68, 0.1)',
+        icon: `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 3l8 8m0-8l-8 8" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+        </svg>`
+    }
+};
 
-
-
-
-
-
-
-
-
-
-
-
-
-// function addNewBook(booksList, bookData) {
-//     const book = document.createElement("div");
-//     book.style.padding = "12px 16px";
-//     book.style.backgroundColor = "white";
-//     book.style.borderRadius = "10px";
-//     book.style.cursor = "pointer";
-//     book.style.transition = "all 0.2s ease";
-//     book.style.border = "1px solid rgba(0,0,0,0.05)";
-//     book.style.boxShadow = "0 2px 4px rgba(0,0,0,0.02)";
-//     book.style.position = "relative";
-
-//     book.innerHTML = `
-//         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px">
-//             <div style="font-size: 14px; font-weight: 500; color: #334155">${bookData.title}</div>
-//             <div style="font-size: 11px; color: #94a3b8">${bookData.lastEdited}</div>
-//         </div>
-//         <div style="font-size: 12px; color: #64748b">${bookData.category}</div>
-//     `;
-
-//     // Hover effects
-//     book.onmouseover = () => {
-//         book.style.backgroundColor = "#f8fafc";
-//         book.style.borderColor = "#3b82f6";
-//         book.style.transform = "translateX(5px)";
-//         book.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
-//     };
-
-//     book.onmouseout = () => {
-//         book.style.backgroundColor = "white";
-//         book.style.borderColor = "rgba(0,0,0,0.05)";
-//         book.style.transform = "translateX(0)";
-//         book.style.boxShadow = "0 2px 4px rgba(0,0,0,0.02)";
-//     };
-
-//     book.onclick = () => openChat(bookData.title);
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-//     booksList.appendChild(book);
-// }
+    if (diffDays === 0) {
+        const hours = Math.floor(diffTime / (1000 * 60 * 60));
+        if (hours === 0) return 'Just now';
+        return `${hours}h ago`;
+    }
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+}
 
-//list --- view
+function createStatusIndicator(state) {
+    if (!state || !STATUS_CONFIGS[state]) return null;
+    
+    const config = STATUS_CONFIGS[state];
+    const indicator = document.createElement('div');
+    applyStyles(indicator, styles.statusIndicator);
+    indicator.style.background = config.background;
+    indicator.style.padding = '2px 8px';
+    indicator.style.borderRadius = '4px';
+    indicator.innerHTML = config.icon;
+    
+    if (state === 'START') {
+        const uniqueClassName = `pulse-${Math.random().toString(36).substr(2, 9)}`;
+        const pulseDiv = indicator.querySelector('div');
+        if(pulseDiv) {
+            pulseDiv.classList.add(uniqueClassName);
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ${uniqueClassName}-pulse {
+                    0% { transform: scale(1); opacity: 0.8; }
+                    50% { transform: scale(1.1); opacity: 0.4; }
+                    100% { transform: scale(1); opacity: 0.8; }
+                }
+                .${uniqueClassName} {
+                    animation: ${uniqueClassName}-pulse 1.5s infinite;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    return indicator;
+}
+
+function applyStyles(element, styleObj) {
+    Object.assign(element.style, styleObj);
+}
+
+// Функция создания элемента книги на основе полученных данных с сервера
 function createBookItem(bookData) {
     const book = document.createElement("div");
-    book.style.padding = "12px 16px";
-    book.style.backgroundColor = "white";
-    book.style.borderRadius = "10px";
-    book.style.cursor = "pointer";
-    book.style.transition = "all 0.2s ease";
-    book.style.border = "1px solid rgba(0,0,0,0.05)";
-    book.style.boxShadow = "0 2px 4px rgba(0,0,0,0.02)";
-    book.style.position = "relative";
-    book.style.width = "100%";
-    book.style.boxSizing = "border-box";
-    book.style.marginBottom = "8px";
-
-    book.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px">
-            <div style="font-size: 14px; font-weight: 500; color: #334155">${bookData.title}</div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <div style="font-size: 11px; color: #94a3b8">${bookData.lastEdited}</div>
-                <div class="menu-trigger" style="cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s ease;">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="color: #94a3b8">
-                        <circle cx="8" cy="2" r="1.5"/>
-                        <circle cx="8" cy="8" r="1.5"/>
-                        <circle cx="8" cy="14" r="1.5"/>
-                    </svg>
-                </div>
-            </div>
-        </div>
-        <div style="font-size: 12px; color: #64748b">${bookData.category}</div>
+    applyStyles(book, styles.bookItem);
+    
+    const content = document.createElement("div");
+    applyStyles(content, styles.bookContent);
+    
+    // Верхняя строка с заголовком и метаданными
+    const topRow = document.createElement("div");
+    applyStyles(topRow, styles.topRow);
+    
+    const titleContainer = document.createElement("div");
+    applyStyles(titleContainer, styles.titleContainer);
+    
+    const title = document.createElement("div");
+    applyStyles(title, styles.title);
+    title.textContent = bookData.title;
+    
+    const metadata = document.createElement("div");
+    applyStyles(metadata, styles.metadata);
+    
+    const dateContainer = document.createElement("div");
+    applyStyles(dateContainer, styles.dateContainer);
+    
+    const date = document.createElement("div");
+    applyStyles(date, styles.date);
+    date.textContent = formatDate(bookData.CreateDate);
+    
+    const menuTrigger = document.createElement("div");
+    applyStyles(menuTrigger, styles.menuTrigger);
+    menuTrigger.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="color: #94a3b8">
+            <circle cx="8" cy="2" r="1.5"/>
+            <circle cx="8" cy="8" r="1.5"/>
+            <circle cx="8" cy="14" r="1.5"/>
+        </svg>
     `;
-
+    
     const dropdown = document.createElement("div");
-    dropdown.style.position = "absolute";
-    dropdown.style.right = "12px";
-    dropdown.style.top = "30px";
-    dropdown.style.background = "white";
-    dropdown.style.borderRadius = "8px";
-    dropdown.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
-    dropdown.style.padding = "6px";
-    dropdown.style.display = "none";
-    dropdown.style.zIndex = "100";
-    dropdown.style.border = "1px solid #e2e8f0";
-    dropdown.style.minWidth = "150px";
-
+    applyStyles(dropdown, styles.dropdownMenu);
+    
     const deleteBtn = document.createElement("div");
+    applyStyles(deleteBtn, styles.deleteButton);
     deleteBtn.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; color: #ef4444; font-size: 13px; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-            Delete Book
-        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+        Delete Book
     `;
-
+    
+    titleContainer.appendChild(title);
+    dateContainer.appendChild(date);
+    metadata.appendChild(dateContainer);
+    metadata.appendChild(menuTrigger);
+    
+    topRow.appendChild(titleContainer);
+    topRow.appendChild(metadata);
+    
+    content.appendChild(topRow);
+    
+    // Если есть статус книги, добавляем индикатор
+    const statusIndicator = createStatusIndicator(bookData.state);
+    if (statusIndicator) {
+        content.appendChild(statusIndicator);
+    }
+    
+    book.appendChild(content);
+    
+    // Hover эффекты
+    book.onmouseover = () => {
+        applyStyles(book, {
+            backgroundColor: '#f8fafc',
+            transform: 'translateX(5px)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+        });
+    };
+    book.onmouseout = () => {
+        applyStyles(book, {
+            backgroundColor: 'white',
+            transform: 'none',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)'
+        });
+    };
+    menuTrigger.onmouseover = () => {
+        applyStyles(menuTrigger, { backgroundColor: '#f1f5f9' });
+    };
+    menuTrigger.onmouseout = () => {
+        applyStyles(menuTrigger, { backgroundColor: 'transparent' });
+    };
     deleteBtn.onmouseover = () => {
-        deleteBtn.style.backgroundColor = "#fef2f2";
+        applyStyles(deleteBtn, { backgroundColor: '#fef2f2' });
     };
-
     deleteBtn.onmouseout = () => {
-        deleteBtn.style.backgroundColor = "transparent";
+        applyStyles(deleteBtn, { backgroundColor: 'transparent' });
     };
-
+    
+    // Обработчики кликов
     deleteBtn.onclick = (e) => {
         e.stopPropagation();
         if (confirm("Are you sure you want to delete this book?")) {
@@ -668,51 +830,69 @@ function createBookItem(bookData) {
         }
         dropdown.style.display = "none";
     };
-
-    dropdown.appendChild(deleteBtn);
-    book.appendChild(dropdown);
-
-    const menuTrigger = book.querySelector('.menu-trigger');
     menuTrigger.onclick = (e) => {
         e.stopPropagation();
         dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
     };
-
-    menuTrigger.onmouseover = () => {
-        menuTrigger.style.backgroundColor = "#f1f5f9";
-    };
-
-    menuTrigger.onmouseout = () => {
-        menuTrigger.style.backgroundColor = "transparent";
-    };
-
     document.addEventListener('click', () => {
         dropdown.style.display = "none";
     });
-
-    book.onmouseover = () => {
-        book.style.backgroundColor = "#f8fafc";
-        book.style.borderColor = "#3b82f6";
-        book.style.transform = "translateX(5px)";
-        book.style.boxShadow = "0 4px 12px rgba(0,0,0,0.05)";
-    };
-
-    book.onmouseout = () => {
-        book.style.backgroundColor = "white";
-        book.style.borderColor = "rgba(0,0,0,0.05)";
-        book.style.transform = "translateX(0)";
-        book.style.boxShadow = "0 2px 4px rgba(0,0,0,0.02)";
-    };
-
-    book.onclick = () => openChatBook(bookDat.id);
-
+    dropdown.appendChild(deleteBtn);
+    book.appendChild(dropdown);
+    
+    book.onclick = () => openChatBook(bookData.id);
+    
     return book;
 }
 
+// Функция обновления интерфейса на основе данных с сервера
+function updateUI(data) {
+    console.log("Ответ от сервера:", data);
+
+    // Обновление фото профиля
+    if (data.profilePicture) {
+        document.getElementById('profile-pic').src = data.profilePicture;
+    }
+
+    // Обновление количества кредитов
+    document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
+
+    // Обновление заголовка боковой панели с количеством книг
+    const headerSubtitle = document.querySelector('.sidebar-header-subtitle');
+    if (headerSubtitle) {
+        headerSubtitle.textContent = `${data.books.length} books`;
+    }
+
+    // Обновление списка книг
+    const booksList = document.getElementById('books-list');
+    booksList.innerHTML = ''; // очищаем список
+
+    if (data.books && Array.isArray(data.books)) {
+        data.books.forEach(book => {
+            const bookItem = createBookItem(book);
+            booksList.appendChild(bookItem);
+        });
+    }
+}
+
+// Функция, добавляющая новый элемент книги в список (при необходимости)
 function addNewBook(booksList, bookData) {
     const bookItem = createBookItem(bookData);
     booksList.appendChild(bookItem);
 }
+
+// Пример вызова updateUI после получения данных с сервера:
+// fetchDataFromAPI().then(data => updateUI(data));
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2170,7 +2350,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 //     initializeApp();
 // });
-
-
-
-
