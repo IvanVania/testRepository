@@ -940,7 +940,7 @@ function openChatBook(bookId) {
     window.loadingIndicator.startLoading();
 
     // Делаем POST-запрос к API
-    fetch('https://32rch1nb3j.execute-api.us-east-2.amazonaws.com/default/getChatBookDATA', {
+    fetch('https://tbq9c4b34j.execute-api.us-east-2.amazonaws.com/default/', {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
