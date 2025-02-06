@@ -2350,15 +2350,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const navbar = createNavbar();
     const loadingIndicator = createMainLoadingIndicator();
+    // Присваиваем загрузочный индикатор глобально, чтобы его можно было вызывать в других функциях:
+    window.loadingIndicator = loadingIndicator;
     const mainContainer = createMainContainer();
 
     document.body.appendChild(navbar);
     document.body.appendChild(loadingIndicator);
     document.body.appendChild(mainContainer);
 
-    // Тест загрузки
-    loadingIndicator.startLoading();
+    // Для теста можно включить индикатор, затем выключить:
+    // window.loadingIndicator.startLoading();
+    // setTimeout(() => window.loadingIndicator.stopLoading(), 3000);
 });
+
 
 
 
