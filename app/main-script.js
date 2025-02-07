@@ -1735,7 +1735,9 @@ function createInputPanel2(messagesArea) {
     return panel;
 }
 
-//start generate componet
+
+
+//start re generate componet
 function createGenerationHeader() {
     const header = document.createElement("div");
     header.style.display = "flex";
@@ -1852,11 +1854,122 @@ function createControlsRow2(messagesArea, textarea) {
         regenerateBtn.style.transform = "translateY(0)";
         regenerateBtn.style.boxShadow = "0 4px 12px rgba(99, 102, 241, 0.2)";
     };
+
+        // Добавляем обработчик события на клик по кнопке "Regenerate"
+    regenerateBtn.onclick = () => sendRegenerateBookPlan();
     
     controls.appendChild(wordCountDisplay);
     controls.appendChild(regenerateBtn);
     return controls;
 }
+//
+let isRegenerationInProgress = false;
+
+function sendRegenerateBookPlan() {
+    if (isRegenerationInProgress) {
+        console.log("Regeneration already in progress.");
+        return; // Не разрешаем запускать несколько запросов подряд
+    }
+
+    isRegenerationInProgress = true;
+
+    const input = document.getElementById('chat-text-input'); // Используем правильное id для textarea
+    const message = input.value;
+    const messagesArea = document.getElementById('chat-messages-area'); // id для области сообщений
+
+    const payload = {
+        oldText: messagesArea.textContent, // Старый текст из области сообщений
+        additionalHints: message, // Текст из поля ввода
+    };
+
+    console.log('Data sent:', payload);
+
+    // Показываем индикатор загрузки
+    if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+        window.loadingIndicator.startLoading();
+    }
+
+    const messagesContainer = document.getElementById('chat-messages-area');
+    messagesContainer.innerHTML = '<div class="loading-spinner"></div>'; // Добавляем спиннер в контейнер
+
+    // Очищаем поле ввода
+    input.value = '';
+
+    // Отправляем запрос на сервер
+    fetch('https://3mualszt9f.execute-api.us-east-2.amazonaws.com/default/RegeneratePlanBook', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.href = 'https://thedisc.xyz/login'; // Переход на страницу логина при 401 ошибке
+            return;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.regeneratedPlan) {
+            // Если новый план получен, заменяем старый
+            messagesContainer.innerHTML = `<div>New book plan:<br>${data.regeneratedPlan}</div>`;
+        } else {
+            // Если ошибка в ответе
+            messagesContainer.innerHTML = `<div>Error: ${data.error || 'Unexpected response from the server'}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        messagesContainer.innerHTML = `<div>Error: Failed to regenerate book plan</div>`;
+    })
+    .finally(() => {
+        isRegenerationInProgress = false; // Завершаем процесс перегенерации
+        // Останавливаем индикатор загрузки
+        if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+            window.loadingIndicator.stopLoading();
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
