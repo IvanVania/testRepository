@@ -1,56 +1,91 @@
 
-function updateUI(data) {
-    console.log("Ответ от сервера:", data);
+// function updateUI(data) {
+//     console.log("Ответ от сервера:", data);
 
-    // Обновление фото профиля
+//     // Обновление фото профиля
+//     if (data.profilePicture) {
+//         document.getElementById('profile-pic').src = data.profilePicture;
+//     }
+
+//     // Обновление количества кредитов
+//     document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
+
+//     // Обновление заголовка боковой панели (например, количества книг)
+//     const headerSubtitle = document.querySelector('.sidebar-header-subtitle');
+//     if (headerSubtitle) {
+//         headerSubtitle.textContent = `${data.books.length} books`;
+//     }
+
+//     // // Обновление списка книг
+    
+//     // const booksList = document.getElementById('books-list');
+//     // // Очищаем содержимое списка
+//     // booksList.innerHTML = '';
+
+//     // // Если данные с сервера содержат массив книг, создаем для каждой книги элемент и добавляем в список
+//     // if (data.books && Array.isArray(data.books)) {
+//     //     data.books.forEach(book => {
+//     //         // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
+//     //         const bookItem = createBookItem(book);
+//     //         booksList.appendChild(bookItem);
+//     //     });
+//     // }
+// // Обновление списка книг
+// const booksList = document.getElementById('books-list');
+// // Очищаем содержимое списка
+// booksList.innerHTML = '';
+
+// // Проверяем, что data.books существует и является массивом
+// if (data.books && Array.isArray(data.books)) {
+//     // Создаем новый массив, копируя исходный, и сортируем его по дате (самые новые первыми)
+//     const sortedBooks = data.books.slice().sort((a, b) => {
+//         return new Date(b.CreateDate) - new Date(a.CreateDate);
+//     });
+    
+//     // Для каждой книги из отсортированного массива создаем элемент и добавляем в список
+//     sortedBooks.forEach(book => {
+//         const bookItem = createBookItem(book);
+//         booksList.appendChild(bookItem);
+//     });
+// }
+
+
+
+// }
+function updateUI(data) {
+    // Профиль и кредиты
     if (data.profilePicture) {
         document.getElementById('profile-pic').src = data.profilePicture;
     }
-
-    // Обновление количества кредитов
     document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
 
-    // Обновление заголовка боковой панели (например, количества книг)
+    // Заголовок боковой панели
     const headerSubtitle = document.querySelector('.sidebar-header-subtitle');
     if (headerSubtitle) {
         headerSubtitle.textContent = `${data.books.length} books`;
     }
 
-    // // Обновление списка книг
-    
-    // const booksList = document.getElementById('books-list');
-    // // Очищаем содержимое списка
-    // booksList.innerHTML = '';
+    // Вывод оригинального массива
+    console.log('=== ORIGINAL ARRAY ===');
+    console.table(data.books);
 
-    // // Если данные с сервера содержат массив книг, создаем для каждой книги элемент и добавляем в список
-    // if (data.books && Array.isArray(data.books)) {
-    //     data.books.forEach(book => {
-    //         // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
-    //         const bookItem = createBookItem(book);
-    //         booksList.appendChild(bookItem);
-    //     });
-    // }
-// Обновление списка книг
-const booksList = document.getElementById('books-list');
-// Очищаем содержимое списка
-booksList.innerHTML = '';
+    const booksList = document.getElementById('books-list');
+    booksList.innerHTML = '';
 
-// Проверяем, что data.books существует и является массивом
-if (data.books && Array.isArray(data.books)) {
-    // Создаем новый массив, копируя исходный, и сортируем его по дате (самые новые первыми)
-    const sortedBooks = data.books.slice().sort((a, b) => {
-        return new Date(b.CreateDate) - new Date(a.CreateDate);
-    });
-    
-    // Для каждой книги из отсортированного массива создаем элемент и добавляем в список
-    sortedBooks.forEach(book => {
-        const bookItem = createBookItem(book);
-        booksList.appendChild(bookItem);
-    });
-}
+    if (data.books && Array.isArray(data.books)) {
+        const sortedBooks = data.books.slice().sort((a, b) => {
+            return new Date(b.CreateDate) - new Date(a.CreateDate);
+        });
+        
+        // Вывод отсортированного массива
+        console.log('=== SORTED ARRAY ===');
+        console.table(sortedBooks);
 
-
-
+        sortedBooks.forEach(book => {
+            const bookItem = createBookItem(book);
+            booksList.appendChild(bookItem);
+        });
+    }
 }
 
 
@@ -1838,7 +1873,8 @@ function createInputPanel2(messagesArea, bookData) {
     panel.style.boxSizing = "border-box";
 
     // Header Section
-    const header = createGenerationHeader();
+    // Передаём объект bookData в функцию создания заголовка, чтобы внутри неё можно было получить bookData.id
+    const header = createGenerationHeader(bookData);
     
     // Textarea Container
     const textareaContainer = document.createElement("div");
@@ -1859,7 +1895,7 @@ function createInputPanel2(messagesArea, bookData) {
 }
 
 // Функция создания заголовка панели генерации (без изменений)
-function createGenerationHeader() {
+function createGenerationHeader(bookData) {
     const header = document.createElement("div");
     header.style.display = "flex";
     header.style.justifyContent = "space-between";
@@ -1923,10 +1959,74 @@ function createGenerationHeader() {
         startBtn.style.boxShadow = "0 2px 8px rgba(16, 185, 129, 0.2)";
     };
     
+    // Передаём объект bookData, извлекаем id и вызываем функцию при нажатии на кнопку
+    startBtn.addEventListener("click", () => {
+        startBookGeneration(bookData.id);
+    });
+    
     header.appendChild(title);
     header.appendChild(startBtn);
     return header;
 }
+
+//START
+function startBookGeneration(bookId) {
+    console.log("Start generation for book:", bookId);
+
+    const jwtToken = localStorage.getItem('jwtToken');
+    const payload = { bookId: bookId };
+
+    fetch('https://gurn9gbvb5.execute-api.us-east-2.amazonaws.com/default/startGenerateBook', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.href = 'https://thedisc.xyz/login';
+            return;
+        } else if (response.status === 403) {
+            window.location.href = 'https://thedisc.xyz/buy-credit/';
+            return;
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response from server:', data);
+        if (data.message === 'START') {
+            console.log('Generation started successfully');
+            // Replace panel 2 with panel 3 (loading)
+            const bookContent = document.getElementById('book-content');
+            const inputPanel = bookContent.querySelector('#input-panel');
+            if (inputPanel && inputPanel.parentNode) {
+                const newPanel = createInputPanel3(bookContent);
+                inputPanel.parentNode.replaceChild(newPanel, inputPanel);
+            }
+            activeBookId = bookId;
+            if (activeIntervalId) {
+                clearInterval(activeIntervalId);
+                activeIntervalId = null;
+            }
+            startProgressCheck(bookId);
+            decreaseCredits();
+        } else {
+            console.error('Unexpected response:', data);
+            alert('Error: Failed to start book generation');
+        }
+    })
+    .catch(error => {
+        console.error('Error starting generation:', error);
+        alert('Error: Failed to start book generation');
+    });
+}
+
+
+
+
+
 
 // Функция создания ряда элементов управления, принимает messagesArea, textarea и bookData (объект).
 // При клике на кнопку извлекается id из bookData и передаётся в API-функцию.
