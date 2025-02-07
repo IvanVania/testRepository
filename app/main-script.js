@@ -1186,7 +1186,7 @@ function createChatAreaWithState(bookData, bookState) {
     let inputPanel;
     switch (bookState) {
         case 'START':
-            startProgressCheck(bookData.BookID);
+            // startProgressCheck(bookData.BookID);
             inputPanel = createInputPanel3(messagesArea, bookData);
             break;
         case 'FINISHED':
