@@ -30,16 +30,23 @@ function updateUI(data) {
     //         booksList.appendChild(bookItem);
     //     });
     // }
-    if (data.books && Array.isArray(data.books)) {
-    // Сортируем книги по дате (самые новые сначала)
+// Обновление списка книг
+const booksList = document.getElementById('books-list');
+// Очищаем содержимое списка
+booksList.innerHTML = '';
+
+if (data.books && Array.isArray(data.books)) {
+    // Сортируем книги по дате: самые новые (с большим CreateDate) будут первыми
     data.books.sort((a, b) => new Date(b.CreateDate) - new Date(a.CreateDate));
     
+    // Для каждой книги создаём DOM-элемент и добавляем его в список
     data.books.forEach(book => {
         // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
         const bookItem = createBookItem(book);
         booksList.appendChild(bookItem);
     });
 }
+
 
 }
 
