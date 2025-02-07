@@ -52,35 +52,53 @@
 
 
 // }
+function printArray(title, array) {
+    process.stdout.write('\n' + title + '\n');
+    process.stdout.write('='.repeat(50) + '\n');
+    array.forEach((item, index) => {
+        process.stdout.write(`${index + 1}. ID: ${item.id}\n`);
+        process.stdout.write(`   Title: ${item.title}\n`);
+        process.stdout.write(`   Date: ${item.CreateDate}\n`);
+        process.stdout.write(`   State: ${item.state}\n`);
+        process.stdout.write('-'.repeat(50) + '\n');
+    });
+}
+
 function updateUI(data) {
-    // Профиль и кредиты
     if (data.profilePicture) {
         document.getElementById('profile-pic').src = data.profilePicture;
     }
     document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
 
-    // Заголовок боковой панели
     const headerSubtitle = document.querySelector('.sidebar-header-subtitle');
     if (headerSubtitle) {
         headerSubtitle.textContent = `${data.books.length} books`;
     }
 
-    // Вывод оригинального массива
-    console.log('=== ORIGINAL ARRAY ===');
-    console.table(data.books);
+    // Print original array to terminal
+    printArray('ORIGINAL BOOKS ARRAY', data.books);
 
     const booksList = document.getElementById('books-list');
     booksList.innerHTML = '';
 
     if (data.books && Array.isArray(data.books)) {
-        const sortedBooks = data.books.slice().sort((a, b) => {
-            return new Date(b.CreateDate) - new Date(a.CreateDate);
-        });
-        
-        // Вывод отсортированного массива
-        console.log('=== SORTED ARRAY ===');
-        console.table(sortedBooks);
+        // Create normalized array
+        const normalizedBooks = data.books.map(book => ({
+            id: book.id,
+            title: book.title,
+            CreateDate: new Date(book.CreateDate),
+            state: book.state
+        }));
 
+        // Sort normalized array
+        const sortedBooks = normalizedBooks.sort((a, b) => 
+            b.CreateDate.getTime() - a.CreateDate.getTime()
+        );
+
+        // Print sorted array to terminal
+        printArray('SORTED BOOKS ARRAY', sortedBooks);
+
+        // Create cells from sorted array
         sortedBooks.forEach(book => {
             const bookItem = createBookItem(book);
             booksList.appendChild(bookItem);
@@ -464,43 +482,6 @@ function createLogoutButton() {
 //USER DATA - OBJECT
 
 
-
-
-
-
-
-
-// sidebar-component.js
-// const sampleBooks = [
-//     { id: 1, title: "The AI Revolution", category: "Science", lastEdited: "Just now" },
-//     { id: 2, title: "Deep Learning Basics", category: "Technology", lastEdited: "2h ago" },
-//     { id: 3, title: "Future of Computing", category: "Technology", lastEdited: "3h ago" },
-//     { id: 4, title: "Quantum Physics", category: "Science", lastEdited: "5h ago" },
-//     { id: 5, title: "Web Development", category: "Programming", lastEdited: "Yesterday" },
-//     { id: 6, title: "Data Science", category: "Technology", lastEdited: "2 days ago" },
-//     { id: 7, title: "Machine Learning", category: "AI", lastEdited: "3 days ago" },
-//     { id: 8, title: "Python Mastery", category: "Programming", lastEdited: "4 days ago" },
-//     { id: 9, title: "JavaScript Advanced", category: "Programming", lastEdited: "5 days ago" },
-//     { id: 10, title: "Cybersecurity", category: "Technology", lastEdited: "1 week ago" },    
-//     { id: 13, title: "Future of Computing", category: "Technology", lastEdited: "3h ago" },
-//     { id: 14, title: "Quantum Physics", category: "Science", lastEdited: "5h ago" },
-//     { id: 15, title: "Web Development", category: "Programming", lastEdited: "Yesterday" },
-//     { id: 16, title: "Data Science", category: "Technology", lastEdited: "2 days ago" },
-//     { id: 17, title: "Machine Learning", category: "AI", lastEdited: "3 days ago" },
-//     { id: 18, title: "Python Mastery", category: "Programming", lastEdited: "4 days ago" },
-//     { id: 19, title: "JavaScript Advanced", category: "Programming", lastEdited: "5 days ago" },
-//     { id: 110, title: "Cybersecurity", category: "Technology", lastEdited: "1 week ago" },
-// ];
-const sampleBooks2 = [
-    { id: '1730405052387-0.8575074708404704', title: 'AI Revolution', CreateDate: '2024-03-01T20:04:12.387Z', state: null },
-    { id: '1730405052388-0.9575074708404704', title: 'Deep Learning', CreateDate: '2024-03-01T18:04:12.387Z', state: 'START' },
-    { id: '1730405052389-0.7575074708404704', title: 'Machine Learning', CreateDate: '2024-02-28T20:04:12.387Z', state: 'FINISHED' },
-    { id: '1730405052390-0.6575074708404704', title: 'Neural Networks', CreateDate: '2024-02-27T20:04:12.387Z', state: 'ERROR' },
-    { id: '1730405052391-0.5575074708404704', title: 'Python Basics', CreateDate: '2024-02-25T20:04:12.387Z', state: null },
-    { id: '1730405052392-0.4575074708404704', title: 'Web Development', CreateDate: '2024-02-23T20:04:12.387Z', state: 'FINISHED' },
-    { id: '1730405052393-0.3575074708404704', title: 'Data Science', CreateDate: '2024-02-20T20:04:12.387Z', state: 'START' },
-    { id: '1730405052394-0.2575074708404704', title: 'Cybersecurity', CreateDate: '2024-02-15T20:04:12.387Z', state: 'ERROR' }
-];
 
 
 
@@ -1027,34 +1008,72 @@ book.onclick = () => {
 }
 
 // Функция обновления интерфейса на основе данных с сервера
-function updateUI(data) { //???
-    console.log("Ответ от сервера:", data);
+// function updateUI(data) { //???
+//     console.log("Ответ от сервера:", data);
 
-    // Обновление фото профиля
+//     // Обновление фото профиля
+//     if (data.profilePicture) {
+//         document.getElementById('profile-pic').src = data.profilePicture;
+//     }
+
+//     // Обновление количества кредитов
+//     document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
+
+//     // Обновление заголовка боковой панели с количеством книг
+//     const headerSubtitle = document.querySelector('.sidebar-header-subtitle');
+//     if (headerSubtitle) {
+//         headerSubtitle.textContent = `${data.books.length} books`;
+//     }
+
+//     // Обновление списка книг
+//     const booksList = document.getElementById('books-list');
+//     booksList.innerHTML = ''; // очищаем список
+
+//     if (data.books && Array.isArray(data.books)) {
+//         data.books.forEach(book => {
+//             const bookItem = createBookItem(book);
+//             booksList.appendChild(bookItem);
+//         });
+//     }
+// }
+function updateUI(data) {
+    // Профиль и кредиты
     if (data.profilePicture) {
         document.getElementById('profile-pic').src = data.profilePicture;
     }
-
-    // Обновление количества кредитов
     document.getElementById('credits').textContent = `Credits: ${data.credits || 0}`;
 
-    // Обновление заголовка боковой панели с количеством книг
+    // Заголовок боковой панели
     const headerSubtitle = document.querySelector('.sidebar-header-subtitle');
     if (headerSubtitle) {
         headerSubtitle.textContent = `${data.books.length} books`;
     }
 
-    // Обновление списка книг
+    // Вывод оригинального массива
+    console.log('=== ORIGINAL ARRAY ===');
+    console.table(data.books);
+
     const booksList = document.getElementById('books-list');
-    booksList.innerHTML = ''; // очищаем список
+    booksList.innerHTML = '';
 
     if (data.books && Array.isArray(data.books)) {
-        data.books.forEach(book => {
+        const sortedBooks = data.books.slice().sort((a, b) => {
+            return new Date(b.CreateDate) - new Date(a.CreateDate);
+        });
+        
+        // Вывод отсортированного массива
+        console.log('=== SORTED ARRAY ===');
+        console.table(sortedBooks);
+
+        sortedBooks.forEach(book => {
             const bookItem = createBookItem(book);
             booksList.appendChild(bookItem);
         });
     }
 }
+
+
+
 
 // Функция, добавляющая новый элемент книги в список (при необходимости)
 function addNewBook(booksList, bookData) {
@@ -1959,6 +1978,7 @@ function createGenerationHeader(bookData) {
         startBtn.style.boxShadow = "0 2px 8px rgba(16, 185, 129, 0.2)";
     };
     
+    console.log("book data:", bookData);
     // Передаём объект bookData, извлекаем id и вызываем функцию при нажатии на кнопку
     startBtn.addEventListener("click", () => {
         startBookGeneration(bookData.id);
