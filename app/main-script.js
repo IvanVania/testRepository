@@ -1486,32 +1486,31 @@ function sendCreateBookPlan() {
   isPlanCreationInProgress = true;
 
   // Получаем значения из полей ввода
-  const textarea = document.querySelector("textarea"); // Получаем textarea, т.к. элемент с id 'book-input' может не быть найден
-  const wordNumberSelect = document.querySelector("select"); // Получаем элемент select для количества слов
-  const requestText = textarea.value.trim(); // Получаем текст из textarea
-  const wordNumber = parseInt(wordNumberSelect.value, 10); // Получаем выбранное количество слов
+  const textarea = document.querySelector("textarea");
+  const wordNumberSelect = document.querySelector("select");
+  const requestText = textarea.value.trim();
+  const wordNumber = parseInt(wordNumberSelect.value, 10);
 
   if (!requestText) {
     isPlanCreationInProgress = false;
     return;
   }
 
-  // Формируем объект запроса (payload)
   const payload = {
     RequestText: requestText,
     WordNumber: wordNumber
   };
   console.log('Data sent:', payload);
 
-  // Получаем контейнер для сообщений (где выводятся результаты API)
-  const messagesContainer = document.getElementById('book-messages');
-  // Очищаем контейнер и добавляем спиннер (элемент с классом "loading-spinner")
+  // Получаем контейнер для сообщений
+  const messagesContainer = document.getElementById('chat-messages-area'); // Используем правильный id
+  // Очищаем контейнер и добавляем спиннер
   messagesContainer.innerHTML = '';
   const spinner = document.createElement('div');
   spinner.className = 'loading-spinner';
   messagesContainer.appendChild(spinner);
 
-  // Очищаем поле ввода и сбрасываем высоту textarea
+  // Очищаем поле ввода
   textarea.value = '';
   textarea.style.height = '100px';
 
@@ -1520,7 +1519,7 @@ function sendCreateBookPlan() {
     window.loadingIndicator.startLoading();
   }
 
-  // Отправляем API-запрос на URL (заменён на новый URL)
+  // Отправляем API-запрос
   fetch('https://l71ibhfxdj.execute-api.us-east-2.amazonaws.com/default/', {
     method: 'POST',
     headers: {
@@ -1545,7 +1544,7 @@ function sendCreateBookPlan() {
 
       if (data.plan) {
         // Добавляем полученный план в область сообщений
-        addMessage(messagesContainer, data.plan);
+        addMessage(messagesContainer, data.plan); // Используем функцию addMessage
 
         // Если функция addNewBookToListAndOpen определена – добавляем новую книгу в список и открываем её
         if (typeof addNewBookToListAndOpen === 'function') {
@@ -1575,6 +1574,27 @@ function sendCreateBookPlan() {
       }
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
