@@ -1212,6 +1212,20 @@ function createChatArea() { //main component --- chat area
     return chatArea;
 }
 
+// function createMessagesArea() {
+//     const messagesArea = document.createElement("div");
+//     messagesArea.style.flex = "1";
+//     messagesArea.style.overflowY = "auto";
+//     messagesArea.style.padding = "20px";
+//     messagesArea.style.scrollBehavior = "smooth";
+    
+//     // Custom scrollbar
+//     messagesArea.style.scrollbarWidth = "thin";
+//     messagesArea.style.scrollbarColor = "#cbd5e1 transparent";
+//     return messagesArea;
+// }
+
+
 function createMessagesArea() {
     const messagesArea = document.createElement("div");
     messagesArea.style.flex = "1";
@@ -1222,8 +1236,14 @@ function createMessagesArea() {
     // Custom scrollbar
     messagesArea.style.scrollbarWidth = "thin";
     messagesArea.style.scrollbarColor = "#cbd5e1 transparent";
+    
+    // Устанавливаем id
+    messagesArea.id = "chat-messages-area"; // Например, здесь задается id
+
     return messagesArea;
 }
+
+
 
 function createDivider() {
     const divider = document.createElement("div");
@@ -1286,6 +1306,7 @@ function createNewBookChatArea() { //  --- chat area
 //text field
 function createInputPanel(messagesArea) {
     const panel = document.createElement("div");
+    panel.id = "input-panel"; // Добавляем id
     panel.style.paddingTop = "20px";
     panel.style.paddingBottom = "20px";
     panel.style.paddingLeft = "20px";
@@ -1310,9 +1331,37 @@ function createInputPanel(messagesArea) {
     return panel;
 }
 
+
 //text area???
+// function createExpandingTextarea() {
+//     const textarea = document.createElement("textarea");
+//     textarea.placeholder = "Describe your book idea...";
+//     textarea.style.width = "100%";
+//     textarea.style.minHeight = "100px";
+//     textarea.style.maxHeight = "300px";
+//     textarea.style.padding = "15px";
+//     textarea.style.borderRadius = "12px";
+//     textarea.style.border = "1px solid #e2e8f0";
+//     textarea.style.fontSize = "14px";
+//     textarea.style.lineHeight = "1.5";
+//     textarea.style.resize = "none";
+//     textarea.style.outline = "none";
+//     textarea.style.transition = "border-color 0.2s ease";
+    
+//     // Auto-expand functionality
+//     textarea.addEventListener('input', () => {
+//         textarea.style.height = 'auto';
+//         textarea.style.height = textarea.scrollHeight + 'px';
+//     });
+    
+//     textarea.onmouseover = () => textarea.style.borderColor = "#94a3b8";
+//     textarea.onmouseout = () => textarea.style.borderColor = "#e2e8f0";
+    
+//     return textarea;
+// }
 function createExpandingTextarea() {
     const textarea = document.createElement("textarea");
+    textarea.id = "chat-text-input"; // Задаем id
     textarea.placeholder = "Describe your book idea...";
     textarea.style.width = "100%";
     textarea.style.minHeight = "100px";
@@ -1338,6 +1387,7 @@ function createExpandingTextarea() {
     return textarea;
 }
 
+
 function createControlsRow(messagesArea, textarea) {
     const controls = document.createElement("div");
     controls.style.display = "flex";
@@ -1353,6 +1403,39 @@ function createControlsRow(messagesArea, textarea) {
     return controls;
 }
 
+// function createWordCountSelector() {
+//     const container = document.createElement("div");
+//     container.style.display = "flex";
+//     container.style.alignItems = "center";
+//     container.style.gap = "10px";
+    
+//     const label = document.createElement("label");
+//     label.textContent = "Target word count:";
+//     label.style.fontSize = "14px";
+//     label.style.color = "#64748b";
+    
+//     const select = document.createElement("select");
+//     select.style.padding = "8px 12px";
+//     select.style.borderRadius = "8px";
+//     select.style.border = "1px solid #e2e8f0";
+//     select.style.fontSize = "14px";
+//     select.style.color = "#1e293b";
+//     select.style.cursor = "pointer";
+//     select.style.background = "white";
+    
+//     const wordCounts = [10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000];
+    
+//     wordCounts.forEach(count => {
+//         const option = document.createElement("option");
+//         option.value = count;
+//         option.textContent = `${count.toLocaleString()} words`;
+//         select.appendChild(option);
+//     });
+    
+//     container.appendChild(label);
+//     container.appendChild(select);
+//     return container;
+// }
 function createWordCountSelector() {
     const container = document.createElement("div");
     container.style.display = "flex";
@@ -1365,6 +1448,7 @@ function createWordCountSelector() {
     label.style.color = "#64748b";
     
     const select = document.createElement("select");
+    select.id = "word-count-selector"; // Добавлено id
     select.style.padding = "8px 12px";
     select.style.borderRadius = "8px";
     select.style.border = "1px solid #e2e8f0";
@@ -1386,6 +1470,8 @@ function createWordCountSelector() {
     container.appendChild(select);
     return container;
 }
+
+
 //crete BOTTON
 function createActionButtons(messagesArea, textarea) {
     const container = document.createElement("div");
@@ -1486,31 +1572,32 @@ function sendCreateBookPlan() {
   isPlanCreationInProgress = true;
 
   // Получаем значения из полей ввода
-  const textarea = document.querySelector("textarea");
-  const wordNumberSelect = document.querySelector("select");
-  const requestText = textarea.value.trim();
-  const wordNumber = parseInt(wordNumberSelect.value, 10);
+  const textarea = document.getElementById("chat-text-input"); // Получаем textarea по id
+  const wordNumberSelect = document.getElementById("word-count-selector"); // Получаем select по id
+  const requestText = textarea.value.trim(); // Получаем текст из textarea
+  const wordNumber = parseInt(wordNumberSelect.value, 10); // Получаем выбранное количество слов
 
   if (!requestText) {
     isPlanCreationInProgress = false;
     return;
   }
 
+  // Формируем объект запроса (payload)
   const payload = {
     RequestText: requestText,
     WordNumber: wordNumber
   };
   console.log('Data sent:', payload);
 
-  // Получаем контейнер для сообщений
-  const messagesContainer = document.getElementById('chat-messages-area'); // Используем правильный id
-  // Очищаем контейнер и добавляем спиннер
+  // Получаем контейнер для сообщений (где выводятся результаты API)
+  const messagesContainer = document.getElementById('chat-messages-area'); // Исправлено на правильный id
+  // Очищаем контейнер и добавляем спиннер (элемент с классом "loading-spinner")
   messagesContainer.innerHTML = '';
   const spinner = document.createElement('div');
   spinner.className = 'loading-spinner';
   messagesContainer.appendChild(spinner);
 
-  // Очищаем поле ввода
+  // Очищаем поле ввода и сбрасываем высоту textarea
   textarea.value = '';
   textarea.style.height = '100px';
 
@@ -1519,7 +1606,7 @@ function sendCreateBookPlan() {
     window.loadingIndicator.startLoading();
   }
 
-  // Отправляем API-запрос
+  // Отправляем API-запрос на URL (заменён на новый URL)
   fetch('https://l71ibhfxdj.execute-api.us-east-2.amazonaws.com/default/', {
     method: 'POST',
     headers: {
@@ -1544,7 +1631,7 @@ function sendCreateBookPlan() {
 
       if (data.plan) {
         // Добавляем полученный план в область сообщений
-        addMessage(messagesContainer, data.plan); // Используем функцию addMessage
+        addMessage(messagesContainer, data.plan);
 
         // Если функция addNewBookToListAndOpen определена – добавляем новую книгу в список и открываем её
         if (typeof addNewBookToListAndOpen === 'function') {
@@ -1585,29 +1672,40 @@ function sendCreateBookPlan() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //UI2
+// function createInputPanel2(messagesArea) {
+//     const panel = document.createElement("div");
+//     panel.style.paddingTop = "20px";
+//     panel.style.paddingBottom = "20px";
+//     panel.style.paddingLeft = "20px";
+//     panel.style.paddingRight = "40px";
+//     panel.style.backgroundColor = "#f8fafc";
+//     panel.style.borderTop = "1px solid #e2e8f0";
+//     panel.style.width = "100%";
+//     panel.style.boxSizing = "border-box";
+
+//     // Header Section
+//     const header = createGenerationHeader();
+    
+//     // Textarea Container
+//     const textareaContainer = document.createElement("div");
+//     textareaContainer.style.marginBottom = "15px";
+//     textareaContainer.style.width = "100%";
+//     textareaContainer.style.boxSizing = "border-box";
+    
+//     const textarea = createExpandingTextarea();
+//     const controlsRow = createControlsRow2(messagesArea, textarea);
+    
+//     textareaContainer.appendChild(textarea);
+//     panel.appendChild(header);
+//     panel.appendChild(textareaContainer);
+//     panel.appendChild(controlsRow);
+    
+//     return panel;
+// }
 function createInputPanel2(messagesArea) {
     const panel = document.createElement("div");
+    panel.id = "input-panel-2"; // Добавляем id
     panel.style.paddingTop = "20px";
     panel.style.paddingBottom = "20px";
     panel.style.paddingLeft = "20px";
@@ -1636,6 +1734,7 @@ function createInputPanel2(messagesArea) {
     
     return panel;
 }
+
 //start generate componet
 function createGenerationHeader() {
     const header = document.createElement("div");
