@@ -16,19 +16,31 @@ function updateUI(data) {
         headerSubtitle.textContent = `${data.books.length} books`;
     }
 
-    // Обновление списка книг
-    const booksList = document.getElementById('books-list');
-    // Очищаем содержимое списка
-    booksList.innerHTML = '';
+    // // Обновление списка книг
+    
+    // const booksList = document.getElementById('books-list');
+    // // Очищаем содержимое списка
+    // booksList.innerHTML = '';
 
-    // Если данные с сервера содержат массив книг, создаем для каждой книги элемент и добавляем в список
+    // // Если данные с сервера содержат массив книг, создаем для каждой книги элемент и добавляем в список
+    // if (data.books && Array.isArray(data.books)) {
+    //     data.books.forEach(book => {
+    //         // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
+    //         const bookItem = createBookItem(book);
+    //         booksList.appendChild(bookItem);
+    //     });
+    // }
     if (data.books && Array.isArray(data.books)) {
-        data.books.forEach(book => {
-            // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
-            const bookItem = createBookItem(book);
-            booksList.appendChild(bookItem);
-        });
-    }
+    // Сортируем книги по дате (самые новые сначала)
+    data.books.sort((a, b) => new Date(b.CreateDate) - new Date(a.CreateDate));
+    
+    data.books.forEach(book => {
+        // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
+        const bookItem = createBookItem(book);
+        booksList.appendChild(bookItem);
+    });
+}
+
 }
 
 
