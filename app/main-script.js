@@ -1456,17 +1456,140 @@ function createActionButtons(messagesArea, textarea) {
         createPlanBtn.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.4)";
     };
     
+    // createPlanBtn.onclick = () => {
+    //     if (textarea.value.trim()) {
+    //         addMessage(messagesArea, textarea.value);
+    //         textarea.value = "";
+    //         textarea.style.height = "100px";
+    //     }
+    // };
     createPlanBtn.onclick = () => {
-        if (textarea.value.trim()) {
-            addMessage(messagesArea, textarea.value);
-            textarea.value = "";
-            textarea.style.height = "100px";
-        }
-    };
+  sendCreateBookPlan();
+};
+
     
     container.appendChild(createPlanBtn);
     return container;
 }
+
+
+
+// Глобальная переменная для отслеживания процесса создания плана
+let isPlanCreationInProgress = false;
+
+/**
+ * Функция, вызываемая кнопкой "Create Book Plan".
+ * Отправляет API‑запрос с текстом книги и целевым количеством слов.
+ * При успешном ответе:
+ *  - Добавляет полученный план (API response) в область сообщений (элемент с id "book-messages")
+ *  - Вызывает функцию addNewBookToListAndOpen (если она определена) для добавления новой книги в список
+ *  - Заменяет текущую панель ввода (UI1, элемент с id "input-panel") на UI2 (через createInputPanel2)
+ * При ошибке – выводит сообщение об ошибке в чат.
+ */
+function sendCreateBookPlan() {
+  if (isPlanCreationInProgress) {
+    console.log("Plan creation already in progress.");
+    return;
+  }
+  isPlanCreationInProgress = true;
+
+  // Получаем значения из полей ввода
+  const inputElem = document.getElementById('book-input');
+  const wordNumberSelect = document.getElementById('word-number-select');
+  const requestText = inputElem.value.trim();
+  const wordNumber = parseInt(wordNumberSelect.value, 10);
+
+  if (!requestText) {
+    isPlanCreationInProgress = false;
+    return;
+  }
+
+  // Формируем объект запроса (payload)
+  const payload = {
+    RequestText: requestText,
+    WordNumber: wordNumber
+  };
+  console.log('Data sent:', payload);
+
+  // Получаем контейнер для сообщений (где выводятся результаты API)
+  const messagesContainer = document.getElementById('book-messages');
+  // Очищаем контейнер и добавляем спиннер (элемент с классом "loading-spinner")
+  messagesContainer.innerHTML = '';
+  const spinner = document.createElement('div');
+  spinner.className = 'loading-spinner';
+  messagesContainer.appendChild(spinner);
+
+  // Очищаем поле ввода и сбрасываем высоту textarea
+  inputElem.value = '';
+  inputElem.style.height = '100px';
+
+  // Запускаем глобальный загрузочный индикатор (если определён)
+  if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+    window.loadingIndicator.startLoading();
+  }
+
+  // Отправляем API-запрос на URL (заменён на новый URL)
+  fetch('https://l71ibhfxdj.execute-api.us-east-2.amazonaws.com/default/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+    },
+    body: JSON.stringify(payload)
+  })
+    .then(response => {
+      if (response.status === 401) {
+        window.location.href = 'https://thedisc.xyz/login';
+        throw new Error('Unauthorized');
+      }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Удаляем спиннер из контейнера сообщений
+      messagesContainer.innerHTML = '';
+
+      if (data.plan) {
+        // Добавляем полученный план в область сообщений
+        addMessage(messagesContainer, data.plan);
+
+        // Если функция addNewBookToListAndOpen определена – добавляем новую книгу в список и открываем её
+        if (typeof addNewBookToListAndOpen === 'function') {
+          addNewBookToListAndOpen(data.bookTitle || 'New Book', data.bookId);
+        }
+
+        // Заменяем текущую панель ввода (UI1) на UI2
+        const inputPanelContainer = document.getElementById('input-panel');
+        if (inputPanelContainer && inputPanelContainer.parentNode) {
+          const newInputPanel = createInputPanel2(messagesContainer);
+          inputPanelContainer.parentNode.replaceChild(newInputPanel, inputPanelContainer);
+        }
+      } else {
+        // Если API вернуло ошибку или неожиданный ответ
+        messagesContainer.innerHTML = `<div>Произошла ошибка, извините, попробуйте в другой раз</div>`;
+      }
+    })
+    .catch(error => {
+      console.error('API error:', error);
+      messagesContainer.innerHTML = `<div>Произошла ошибка, извините, попробуйте в другой раз</div>`;
+    })
+    .finally(() => {
+      isPlanCreationInProgress = false;
+      // Останавливаем глобальный загрузочный индикатор (если определён)
+      if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+        window.loadingIndicator.stopLoading();
+      }
+    });
+}
+
+
+
+
+
+
+
 
 
 
