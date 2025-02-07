@@ -1981,7 +1981,7 @@ function createGenerationHeader(bookData) {
     console.log("book data:", bookData);
     // Передаём объект bookData, извлекаем id и вызываем функцию при нажатии на кнопку
     startBtn.addEventListener("click", () => {
-        startBookGeneration(bookData.id);
+        startBookGeneration(bookData.BookID);
     });
     
     header.appendChild(title);
