@@ -946,7 +946,25 @@ function createBookItem(bookData) {
     dropdown.appendChild(deleteBtn);
     book.appendChild(dropdown);
     
-    book.onclick = () => openBookChatArea(bookData.id);
+    // book.onclick = () => openBookChatArea(bookData.id);
+    // Добавляем data-атрибут для идентификации ячейки (остальное не меняем)
+book.setAttribute('data-book-item', 'true');
+
+book.onclick = () => {
+    // Сброс активных стилей для всех ячеек
+    document.querySelectorAll('[data-book-item]').forEach(item => {
+        applyStyles(item, styles.bookItem);
+    });
+    // Применяем активное выделение для нажатой ячейки
+    applyStyles(book, {
+        backgroundColor: '#e0f7fa',         // изменённый фон
+        border: '1px solid #007BFF',         // выделенная граница
+        boxShadow: '0 4px 12px rgba(0, 123, 255, 0.3)' // усиленная тень
+    });
+    // Вызываем функцию открытия книги
+    openBookChatArea(bookData.id);
+};
+
     
     return book;
 }
