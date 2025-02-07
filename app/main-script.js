@@ -1931,10 +1931,22 @@ function sendRegenerateBookPlan(bookId) {
         return response.json();
     })
     .then(data => {
+        // Удаляем спиннер из контейнера сообщений
+        messagesContainer.innerHTML = '';
+
         if (data.regeneratedPlan) {
-            messagesContainer.innerHTML = `<div>New book plan:<br>${data.regeneratedPlan}</div>`;
+            // Добавляем полученный план в область сообщений с помощью addMessage()
+            addMessage(messagesContainer, data.regeneratedPlan);
+
+            // Заменяем текущую панель ввода (UI1) на новую (UI2)
+            const inputPanelContainer = document.getElementById('input-panel');
+            if (inputPanelContainer && inputPanelContainer.parentNode) {
+                const newInputPanel = createInputPanel2(messagesContainer, bookId);
+                inputPanelContainer.parentNode.replaceChild(newInputPanel, inputPanelContainer);
+            }
         } else {
-            messagesContainer.innerHTML = `<div>Error: ${data.error || 'Unexpected response from the server'}</div>`;
+            // Если API вернуло ошибку или неожиданный ответ
+            messagesContainer.innerHTML = `<div>Произошла ошибка, извините, попробуйте в другой раз</div>`;
         }
     })
     .catch(error => {
@@ -1942,12 +1954,13 @@ function sendRegenerateBookPlan(bookId) {
         messagesContainer.innerHTML = `<div>Error: Failed to regenerate book plan</div>`;
     })
     .finally(() => {
-        isRegenerationInProgress = false;
+        isRegenerationInProgress = false; // Завершаем процесс перегенерации
         if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
             window.loadingIndicator.stopLoading();
         }
     });
 }
+
 
 
 
