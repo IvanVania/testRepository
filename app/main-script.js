@@ -1996,6 +1996,9 @@ function startBookGeneration(bookId) {
     const jwtToken = localStorage.getItem('jwtToken');
     const payload = { bookId: bookId };
 
+    // Логирование объекта, который отправляется в API
+    console.log("Sending payload to API:", payload);
+
     fetch('https://gurn9gbvb5.execute-api.us-east-2.amazonaws.com/default/startGenerateBook', {
         method: 'POST',
         headers: {
@@ -2006,9 +2009,11 @@ function startBookGeneration(bookId) {
     })
     .then(response => {
         if (response.status === 401) {
+            console.log("Unauthorized - redirecting to login");
             window.location.href = 'https://thedisc.xyz/login';
             return;
         } else if (response.status === 403) {
+            console.log("Forbidden - redirecting to buy credits");
             window.location.href = 'https://thedisc.xyz/buy-credit/';
             return;
         }
@@ -2018,7 +2023,7 @@ function startBookGeneration(bookId) {
         console.log('Response from server:', data);
         if (data.message === 'START') {
             console.log('Generation started successfully');
-            // Replace panel 2 with panel 3 (loading)
+            // Заменяем панель 2 на панель 3 (loading)
             const bookContent = document.getElementById('book-content');
             const inputPanel = bookContent.querySelector('#input-panel');
             if (inputPanel && inputPanel.parentNode) {
@@ -2042,6 +2047,7 @@ function startBookGeneration(bookId) {
         alert('Error: Failed to start book generation');
     });
 }
+
 
 
 
