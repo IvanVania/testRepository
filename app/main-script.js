@@ -1896,7 +1896,7 @@ function sendRegenerateBookPlan() {
     input.value = '';
 
     // Отправляем запрос на сервер
-    fetch('https://3mualszt9f.execute-api.us-east-2.amazonaws.com/default/RegeneratePlanBook', {
+    fetch('https://dz6ef9xgjj.execute-api.us-east-2.amazonaws.com/default/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
