@@ -1025,7 +1025,7 @@ function createChatAreaWithState(bookData, bookState) {
             inputPanel = createInputPanel5(messagesArea);
             break;
         default:
-            inputPanel = createInputPanel(messagesArea); // Если state === null или другое значение
+            inputPanel = createInputPanel2(messagesArea); // Если state === null или другое значение
     }
 
     chatArea.appendChild(messagesArea);
