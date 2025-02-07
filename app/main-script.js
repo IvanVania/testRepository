@@ -1477,15 +1477,7 @@ function createActionButtons(messagesArea, textarea) {
 // Глобальная переменная для отслеживания процесса создания плана
 let isPlanCreationInProgress = false;
 
-/**
- * Функция, вызываемая кнопкой "Create Book Plan".
- * Отправляет API‑запрос с текстом книги и целевым количеством слов.
- * При успешном ответе:
- *  - Добавляет полученный план (API response) в область сообщений (элемент с id "book-messages")
- *  - Вызывает функцию addNewBookToListAndOpen (если она определена) для добавления новой книги в список
- *  - Заменяет текущую панель ввода (UI1, элемент с id "input-panel") на UI2 (через createInputPanel2)
- * При ошибке – выводит сообщение об ошибке в чат.
- */
+// Функция для отправки запроса на создание плана книги
 function sendCreateBookPlan() {
   if (isPlanCreationInProgress) {
     console.log("Plan creation already in progress.");
@@ -1494,10 +1486,10 @@ function sendCreateBookPlan() {
   isPlanCreationInProgress = true;
 
   // Получаем значения из полей ввода
-  const inputElem = document.getElementById('book-input');
-  const wordNumberSelect = document.getElementById('word-number-select');
-  const requestText = inputElem.value.trim();
-  const wordNumber = parseInt(wordNumberSelect.value, 10);
+  const textarea = document.querySelector("textarea"); // Получаем textarea, т.к. элемент с id 'book-input' может не быть найден
+  const wordNumberSelect = document.querySelector("select"); // Получаем элемент select для количества слов
+  const requestText = textarea.value.trim(); // Получаем текст из textarea
+  const wordNumber = parseInt(wordNumberSelect.value, 10); // Получаем выбранное количество слов
 
   if (!requestText) {
     isPlanCreationInProgress = false;
@@ -1520,10 +1512,10 @@ function sendCreateBookPlan() {
   messagesContainer.appendChild(spinner);
 
   // Очищаем поле ввода и сбрасываем высоту textarea
-  inputElem.value = '';
-  inputElem.style.height = '100px';
+  textarea.value = '';
+  textarea.style.height = '100px';
 
-  // Запускаем глобальный загрузочный индикатор (если определён)
+  // Запускаем индикатор загрузки
   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
     window.loadingIndicator.startLoading();
   }
@@ -1577,13 +1569,12 @@ function sendCreateBookPlan() {
     })
     .finally(() => {
       isPlanCreationInProgress = false;
-      // Останавливаем глобальный загрузочный индикатор (если определён)
+      // Останавливаем индикатор загрузки
       if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
         window.loadingIndicator.stopLoading();
       }
     });
 }
-
 
 
 
