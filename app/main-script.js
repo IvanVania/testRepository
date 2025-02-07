@@ -35,17 +35,20 @@ const booksList = document.getElementById('books-list');
 // Очищаем содержимое списка
 booksList.innerHTML = '';
 
+// Проверяем, что data.books существует и является массивом
 if (data.books && Array.isArray(data.books)) {
-    // Сортируем книги по дате: самые новые (с большим CreateDate) будут первыми
-    data.books.sort((a, b) => new Date(b.CreateDate) - new Date(a.CreateDate));
+    // Создаем новый массив, копируя исходный, и сортируем его по дате (самые новые первыми)
+    const sortedBooks = data.books.slice().sort((a, b) => {
+        return new Date(b.CreateDate) - new Date(a.CreateDate);
+    });
     
-    // Для каждой книги создаём DOM-элемент и добавляем его в список
-    data.books.forEach(book => {
-        // Функция createBookItem формирует DOM-элемент для книги согласно вашим стилям и логике
+    // Для каждой книги из отсортированного массива создаем элемент и добавляем в список
+    sortedBooks.forEach(book => {
         const bookItem = createBookItem(book);
         booksList.appendChild(bookItem);
     });
 }
+
 
 
 }
