@@ -990,6 +990,7 @@ function addMessage(messagesArea, text) {
 }
 
 // Функция создания области чата с учётом состояния книги
+// Функция создания области чата с учётом состояния книги
 function createChatAreaWithState(bookData, bookState) {
     const chatArea = document.createElement("div");
     chatArea.style.flex = "1";
@@ -1003,7 +1004,7 @@ function createChatAreaWithState(bookData, bookState) {
     messagesArea.id = "chat-messages-area";
     messagesArea.classList.add("messages-area");
 
-    // Если в данных книги присутствует план, добавляем его как сообщение с помощью addMessage()
+    // Если в данных книги присутствует план, добавляем его как сообщение
     if (bookData.plan) {
         addMessage(messagesArea, bookData.plan);
     }
@@ -1011,21 +1012,22 @@ function createChatAreaWithState(bookData, bookState) {
     // Создаём разделитель между сообщениями и панелью ввода
     const divider = createDivider();
 
-    // Выбор панели ввода на основе состояния книги
+    // Выбор панели ввода на основе состояния книги.
+    // В вызовы функций создания панели передаём bookData.BookID, чтобы далее он попадал в payload запроса.
     let inputPanel;
     switch (bookState) {
         case 'START':
             startProgressCheck(bookData.BookID);
-            inputPanel = createInputPanel3(messagesArea);
+            inputPanel = createInputPanel3(messagesArea, bookData.id);
             break;
         case 'FINISHED':
-            inputPanel = createInputPanel4(messagesArea);
+            inputPanel = createInputPanel4(messagesArea, bookData.id);
             break;
         case 'ERROR':
-            inputPanel = createInputPanel5(messagesArea);
+            inputPanel = createInputPanel5(messagesArea, bookData.id);
             break;
         default:
-            inputPanel = createInputPanel2(messagesArea); // Если state === null или другое значение
+            inputPanel = createInputPanel2(messagesArea, bookData.id); // Если state === null или другое значение
     }
 
     chatArea.appendChild(messagesArea);
@@ -1034,6 +1036,7 @@ function createChatAreaWithState(bookData, bookState) {
 
     return chatArea;
 }
+
 
 
 
@@ -1703,7 +1706,9 @@ function sendCreateBookPlan() {
     
 //     return panel;
 // }
-function createInputPanel2(messagesArea) {
+// Функция создания панели ввода для перегенерации плана книги
+// Теперь принимает bookId в качестве второго параметра
+function createInputPanel2(messagesArea, bookId) {
     const panel = document.createElement("div");
     panel.id = "input-panel-2"; // Добавляем id
     panel.style.paddingTop = "20px";
@@ -1725,7 +1730,8 @@ function createInputPanel2(messagesArea) {
     textareaContainer.style.boxSizing = "border-box";
     
     const textarea = createExpandingTextarea();
-    const controlsRow = createControlsRow2(messagesArea, textarea);
+    // Передаём bookId в функцию создания ряда управления
+    const controlsRow = createControlsRow2(messagesArea, textarea, bookId);
     
     textareaContainer.appendChild(textarea);
     panel.appendChild(header);
@@ -1735,9 +1741,7 @@ function createInputPanel2(messagesArea) {
     return panel;
 }
 
-
-
-//start re generate componet
+// Функция создания заголовка панели генерации (без изменений)
 function createGenerationHeader() {
     const header = document.createElement("div");
     header.style.display = "flex";
@@ -1781,7 +1785,7 @@ function createGenerationHeader() {
     startBtn.style.alignItems = "center";
     startBtn.style.letterSpacing = "0.3px";
     
-    // Add shine effect
+    // Эффекты наведения и нажатия
     startBtn.style.position = "relative";
     startBtn.style.overflow = "hidden";
     
@@ -1807,7 +1811,8 @@ function createGenerationHeader() {
     return header;
 }
 
-function createControlsRow2(messagesArea, textarea) {
+// Функция создания ряда элементов управления, теперь принимает bookId в качестве параметра
+function createControlsRow2(messagesArea, textarea, bookId) {
     const controls = document.createElement("div");
     controls.style.display = "flex";
     controls.style.justifyContent = "space-between";
@@ -1855,17 +1860,19 @@ function createControlsRow2(messagesArea, textarea) {
         regenerateBtn.style.boxShadow = "0 4px 12px rgba(99, 102, 241, 0.2)";
     };
 
-        // Добавляем обработчик события на клик по кнопке "Regenerate"
-    regenerateBtn.onclick = () => sendRegenerateBookPlan();
+    // При клике по кнопке вызывается sendRegenerateBookPlan с передачей bookId
+    regenerateBtn.onclick = () => sendRegenerateBookPlan(bookId);
     
     controls.appendChild(wordCountDisplay);
     controls.appendChild(regenerateBtn);
     return controls;
 }
-//
+
 let isRegenerationInProgress = false;
 
-function sendRegenerateBookPlan() {
+// Функция отправки запроса на перегенерацию плана книги.
+// Теперь принимает bookId в качестве параметра и включает его в payload.
+function sendRegenerateBookPlan(bookId) {
     if (isRegenerationInProgress) {
         console.log("Regeneration already in progress.");
         return; // Не разрешаем запускать несколько запросов подряд
@@ -1873,13 +1880,15 @@ function sendRegenerateBookPlan() {
 
     isRegenerationInProgress = true;
 
-    const input = document.getElementById('chat-text-input'); // Используем правильное id для textarea
+    const input = document.getElementById('chat-text-input'); // Предполагается, что у вас есть textarea с таким id
     const message = input.value;
-    const messagesArea = document.getElementById('chat-messages-area'); // id для области сообщений
+    const messagesArea = document.getElementById('chat-messages-area'); // Область с текущим текстом плана
 
+    // Формируем payload с bookId
     const payload = {
-        oldText: messagesArea.textContent, // Старый текст из области сообщений
-        additionalHints: message, // Текст из поля ввода
+        oldText: messagesArea.textContent,    // Старый текст из области сообщений
+        additionalHints: message,             // Дополнительные подсказки из поля ввода
+        bookId: bookId                        // Переданный идентификатор книги
     };
 
     console.log('Data sent:', payload);
@@ -1890,12 +1899,12 @@ function sendRegenerateBookPlan() {
     }
 
     const messagesContainer = document.getElementById('chat-messages-area');
-    messagesContainer.innerHTML = '<div class="loading-spinner"></div>'; // Добавляем спиннер в контейнер
+    messagesContainer.innerHTML = '<div class="loading-spinner"></div>'; // Спиннер загрузки
 
     // Очищаем поле ввода
     input.value = '';
 
-    // Отправляем запрос на сервер
+    // Отправляем POST-запрос на сервер с payload
     fetch('https://dz6ef9xgjj.execute-api.us-east-2.amazonaws.com/default/', {
         method: 'POST',
         headers: {
@@ -1916,10 +1925,9 @@ function sendRegenerateBookPlan() {
     })
     .then(data => {
         if (data.regeneratedPlan) {
-            // Если новый план получен, заменяем старый
+            // Если новый план получен, заменяем содержимое
             messagesContainer.innerHTML = `<div>New book plan:<br>${data.regeneratedPlan}</div>`;
         } else {
-            // Если ошибка в ответе
             messagesContainer.innerHTML = `<div>Error: ${data.error || 'Unexpected response from the server'}</div>`;
         }
     })
@@ -1929,12 +1937,17 @@ function sendRegenerateBookPlan() {
     })
     .finally(() => {
         isRegenerationInProgress = false; // Завершаем процесс перегенерации
-        // Останавливаем индикатор загрузки
         if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
             window.loadingIndicator.stopLoading();
         }
     });
 }
+
+
+
+
+
+
 
 
 
