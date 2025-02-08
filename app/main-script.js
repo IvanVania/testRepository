@@ -1919,8 +1919,8 @@ function sendCreateBookPlan() {
 
         // Добавляем новую ячейку книги и делаем её активной
         if (typeof addNewBookToListAndOpen === 'function') {
-          console.log("Calling addNewBookToListAndOpen with:", data.bookTitle || 'New Book', data.bookId);
-          addNewBookToListAndOpen(data.bookTitle || 'New Book', data.bookId);
+          console.log("Calling addNewBookToListAndOpen with:", data.title || 'New Book', data.bookId);
+          addNewBookToListAndOpen(data.title || 'New Book', data.bookId);
         } else {
           console.error("Function addNewBookToListAndOpen is not defined.");
         }
@@ -1953,7 +1953,7 @@ function sendCreateBookPlan() {
 }
 
 // Функция для добавления новой ячейки книги и открытия её
-function addNewBookToListAndOpen(bookTitle, bookId) {
+function addNewBookToListAndOpen(title, bookId) {
   console.log("SUKA TITLE addNewBookToListAndOpen called with:", bookTitle, title, bookId);
 
   // Создаем объект новой книги с минимальными данными
