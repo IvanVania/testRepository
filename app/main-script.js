@@ -2914,13 +2914,76 @@ function createInputPanel4(messagesArea, bookData) {
 // Глобальная переменная для отслеживания процесса загрузки
 let isDownloadInProgress = false;
 
+// function downloadBook(BookID) {
+//     if (isDownloadInProgress) {
+//         console.log("Download already in progress for book:", BookID);
+//         return;
+//     }
+
+//     isDownloadInProgress = true;
+
+//     const jwtToken = localStorage.getItem('jwtToken');
+    
+//     console.log(`Starting download for book with ID: ${BookID}`);
+//     console.log(`JWT Token: ${jwtToken}`);
+
+//     const randomId = Math.random().toString(36).substring(2, 15);
+
+//     fetch('https://tqabehtuci.execute-api.us-east-2.amazonaws.com/default/', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${jwtToken}`
+//         },
+//         body: JSON.stringify({ BookID: BookID })
+//     })
+//     .then(response => {
+//         console.log('Received response:', response);
+//         if (response.status === 401) {
+//             window.location.href = 'https://thedisc.xyz/login';
+//             return;
+//         }
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! status: ${response.status}`);
+//         }
+//         return response.json();
+//     })
+//     .then(data => {
+//         console.log('Parsed response data:', data);
+//         const downloadUrl = data.downloadUrl;
+//         console.log(`Download URL received: ${downloadUrl}`);
+
+//         const a = document.createElement('a');
+//         a.href = downloadUrl;
+//         a.download = `book-ai-${randomId}.pdf`;
+//         document.body.appendChild(a);
+//         a.click();
+//         a.remove();
+//         console.log('Download initiated successfully.');
+//     })
+//     .catch(error => {
+//         console.error('Error loading book:', error);
+//         alert('Failed to download the book.');
+//     })
+//     .finally(() => {
+//         isDownloadInProgress = false;
+//     });
+// }                                                                                                                                                                                                                                                                       
+// Глобальная переменная для отслеживания состояния загрузки
+let isDownloadInProgress = false;
+
 function downloadBook(BookID) {
     if (isDownloadInProgress) {
         console.log("Download already in progress for book:", BookID);
-        return;
+        return; // Не разрешаем запускать несколько запросов одновременно
     }
 
     isDownloadInProgress = true;
+    
+    // Запуск глобального индикатора загрузки, если он реализован
+    if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+        window.loadingIndicator.startLoading();
+    }
 
     const jwtToken = localStorage.getItem('jwtToken');
     
@@ -2940,7 +3003,7 @@ function downloadBook(BookID) {
     .then(response => {
         console.log('Received response:', response);
         if (response.status === 401) {
-            window.location.href = 'https://thedisc.xyz/login';
+            window.location.href = 'https://thedisc.xyz/login'; // Переход на страницу логина при ошибке 401
             return;
         }
         if (!response.ok) {
@@ -2953,6 +3016,7 @@ function downloadBook(BookID) {
         const downloadUrl = data.downloadUrl;
         console.log(`Download URL received: ${downloadUrl}`);
 
+        // Инициируем скачивание, создавая временный элемент <a>
         const a = document.createElement('a');
         a.href = downloadUrl;
         a.download = `book-ai-${randomId}.pdf`;
@@ -2967,8 +3031,12 @@ function downloadBook(BookID) {
     })
     .finally(() => {
         isDownloadInProgress = false;
+        // Останавливаем глобальный индикатор загрузки, если он реализован
+        if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+            window.loadingIndicator.stopLoading();
+        }
     });
-}                                                                                                                                                                                                                                                                       
+}
 
 
 
