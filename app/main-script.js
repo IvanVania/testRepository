@@ -2035,8 +2035,8 @@ function startBookGeneration(bookId) {
                 clearInterval(activeIntervalId);
                 activeIntervalId = null;
             }
-            startProgressCheck(bookId);
-            decreaseCredits();
+            startProgressCheck(bookId); //???
+            decreaseCredits(); //???
         } else {
             console.error('Unexpected response:', data);
             alert('Error: Failed to start book generation');
@@ -2490,7 +2490,7 @@ function createInputPanel3(messagesArea, bookData) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
             },
-            body: JSON.stringify({ bookId: bookData.BookID })
+            body: JSON.stringify({ BookID: bookData.BookID })
         })
         .then(response => response.json())
         .then(data => {
