@@ -1725,13 +1725,18 @@ function createActionButtons(messagesArea, textarea) {
     };
     
     // createPlanBtn.onclick = () => {
-    //     if (textarea.value.trim()) {
-    //         addMessage(messagesArea, textarea.value);
-    //         textarea.value = "";
-    //         textarea.style.height = "100px";
-    //     }
+        // if (textarea.value.trim()) {
+        //     addMessage(messagesArea, textarea.value);
+        //     textarea.value = "";
+        //     textarea.style.height = "100px";
+        // }
     // };
     createPlanBtn.onclick = () => {
+                if (textarea.value.trim()) {
+            addMessage(messagesArea, textarea.value);
+            textarea.value = "";
+            textarea.style.height = "100px";
+        }
   sendCreateBookPlan();
 };
 
@@ -1954,7 +1959,7 @@ function sendCreateBookPlan() {
 
 // Функция для добавления новой ячейки книги и открытия её
 function addNewBookToListAndOpen(title, bookId) {
-  console.log("SUKA TITLE addNewBookToListAndOpen called with:", bookTitle, title, bookId);
+  console.log("SUKA TITLE addNewBookToListAndOpen called with:", title, bookId);
 
   // Создаем объект новой книги с минимальными данными
   const newBookData = {
@@ -2560,6 +2565,8 @@ function sendRegenerateBookPlan(bookId) {
 //     return panel;
 // }
 function createInputPanel3(bookData) {
+    console.log("CHEK bookData:", bookData);
+
   // Запускаем глобальный индикатор загрузки
   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
     console.log("Global loading indicator started.");
