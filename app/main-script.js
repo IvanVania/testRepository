@@ -1732,12 +1732,14 @@ function createActionButtons(messagesArea, textarea) {
         // }
     // };
     createPlanBtn.onclick = () => {
-                if (textarea.value.trim()) {
-            addMessage(messagesArea, textarea.value);
-            textarea.value = "";
-            textarea.style.height = "100px";
-        }
-  sendCreateBookPlan();
+
+     // if (textarea.value.trim()) {
+     //        addMessage(messagesArea, textarea.value);
+     //        textarea.value = "";
+     //        textarea.style.height = "100px";
+     // }
+     sendCreateBookPlan();
+  
 };
 
     
@@ -1866,6 +1868,12 @@ function sendCreateBookPlan() {
     isPlanCreationInProgress = false;
     return;
   }
+
+//
+            addMessage(textarea.value); //???
+
+
+
 
   // Формируем объект запроса
   const payload = {
@@ -2565,12 +2573,18 @@ function sendRegenerateBookPlan(bookId) {
 //     return panel;
 // }
 function createInputPanel3(bookData) {
-    console.log("CHEK bookData:", bookData);
+  // Логируем переданный объект bookData, чтобы проверить наличие BookID
+  console.log("CHEK bookData:", bookData);
+  if (!bookData || !bookData.BookID) {
+    console.error("BookID is missing in bookData:", bookData);
+  }
 
   // Запускаем глобальный индикатор загрузки
   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
     console.log("Global loading indicator started.");
     window.loadingIndicator.startLoading();
+  } else {
+    console.warn("Global loading indicator is not defined or does not have startLoading().");
   }
 
   const panel = document.createElement("div");
@@ -2587,20 +2601,20 @@ function createInputPanel3(bookData) {
 
   // Добавляем keyframes для анимаций
   const keyframes = `
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes dash {
-            0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
-            50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35; }
-            100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124; }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-    `;
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes dash {
+      0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+      50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35; }
+      100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124; }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  `;
   const style = document.createElement('style');
   style.textContent = keyframes;
   document.head.appendChild(style);
@@ -2674,14 +2688,14 @@ function createInputPanel3(bookData) {
   panel.appendChild(statusText);
 
   // --- Логика обновления прогресса ---
-  // Общая длительность симуляции (например, 5 минут для тестирования; для реальности замените на 35*60*1000)
-  const duration = 5 * 60 * 1000;
-  let baseProgress = 0; // Начальное значение прогресса, полученное от API
+  const duration = 5 * 60 * 1000; // 5 минут для тестирования
+  let baseProgress = 0;
   let startTime = Date.now();
-  let isFetching = false; // Флаг для предотвращения множественных запросов
+  let isFetching = false;
 
-  // Функция вызова API, возвращающая JSON с полями "message" и "progress"
+  // Функция для вызова API, возвращающая JSON с полями "message" и "progress"
   const fetchProgressFromAPI = () => {
+    console.log("Calling Progress API with BookID:", bookData.BookID);
     return fetch('https://1vwafyp2gj.execute-api.us-east-2.amazonaws.com/default/', {
       method: 'POST',
       headers: { 
@@ -2701,19 +2715,20 @@ function createInputPanel3(bookData) {
       });
   };
 
-  // Изначально вызываем API для получения стартового прогресса
+  // Изначально получаем стартовый прогресс
   fetchProgressFromAPI().then(initialData => {
-    // Останавливаем глобальный индикатор загрузки после получения первого ответа
     if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
       console.log("Global loading indicator stopped after initial progress fetch.");
       window.loadingIndicator.stopLoading();
     }
     if (initialData) {
       if (initialData.message === "FINISHED") {
+        console.log("Generation finished on initial API call. Opening chat area.");
         openBookChatArea(bookData.BookID);
         return;
       }
       baseProgress = parseFloat(initialData.progress) || 0;
+      console.log("Initial progress:", baseProgress);
       startTime = Date.now() - (baseProgress / 100 * duration);
     }
   });
@@ -2731,17 +2746,22 @@ function createInputPanel3(bookData) {
     progressCircle.style.strokeDashoffset = offset;
     percentageText.textContent = `${Math.round(simulatedProgress)}%`;
 
-    // Если достигнут следующий порог и запрос не выполняется, обновляем через API
+    console.log("Simulated progress:", simulatedProgress, "Base progress:", baseProgress);
+
+    // Если достигнут следующий порог, и запрос не выполняется, обновляем прогресс через API
     if (nextThresholdIndex >= 0 && simulatedProgress >= updateThresholds[nextThresholdIndex] && !isFetching) {
+      console.log(`Threshold ${updateThresholds[nextThresholdIndex]}% reached. Fetching update...`);
       isFetching = true;
       fetchProgressFromAPI().then(data => {
         isFetching = false;
         if (data) {
           if (data.message === "FINISHED") {
+            console.log("Generation finished per API. Opening chat area.");
             openBookChatArea(bookData.BookID);
             return;
           }
           baseProgress = parseFloat(data.progress) || simulatedProgress;
+          console.log("Updated base progress from API:", baseProgress);
           startTime = Date.now() - (baseProgress / 100 * duration);
           nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
         }
@@ -2757,6 +2777,7 @@ function createInputPanel3(bookData) {
         fetchProgressFromAPI().then(data => {
           isFetching = false;
           if (data && data.message === "FINISHED") {
+            console.log("Final API check: Generation finished. Opening chat area.");
             openBookChatArea(bookData.BookID);
           } else if (data) {
             baseProgress = parseFloat(data.progress) || 100;
@@ -2773,6 +2794,7 @@ function createInputPanel3(bookData) {
 
   return panel;
 }
+
 
 
 
