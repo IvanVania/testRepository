@@ -1847,6 +1847,7 @@ function sendCreateBookPlan() {
   const wordNumber = parseInt(wordNumberSelect.value, 10);
 
   if (!requestText) {
+    console.log("No request text provided, aborting plan creation.");
     isPlanCreationInProgress = false;
     return;
   }
@@ -1869,8 +1870,9 @@ function sendCreateBookPlan() {
   textarea.value = '';
   textarea.style.height = '100px';
 
-  // Запускаем индикатор загрузки
+  // Запускаем глобальный индикатор загрузки
   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+    console.log("Starting global loading indicator.");
     window.loadingIndicator.startLoading();
   }
 
@@ -1884,7 +1886,9 @@ function sendCreateBookPlan() {
     body: JSON.stringify(payload)
   })
     .then(response => {
+      console.log("Received response with status:", response.status);
       if (response.status === 401) {
+        console.warn("Unauthorized - redirecting to login.");
         window.location.href = 'https://thedisc.xyz/login';
         throw new Error('Unauthorized');
       }
@@ -1894,25 +1898,34 @@ function sendCreateBookPlan() {
       return response.json();
     })
     .then(data => {
+      console.log("API response data:", data);
       // Убираем спиннер
       messagesContainer.innerHTML = '';
 
       if (data.plan && data.bookId) {
+        console.log("Plan and bookId received from API, updating UI.");
         // Выводим план книги в область сообщений
         addMessage(messagesContainer, data.plan);
 
         // Добавляем новую ячейку книги и делаем её активной
         if (typeof addNewBookToListAndOpen === 'function') {
+          console.log("Calling addNewBookToListAndOpen with:", data.bookTitle || 'New Book', data.bookId);
           addNewBookToListAndOpen(data.bookTitle || 'New Book', data.bookId);
+        } else {
+          console.error("Function addNewBookToListAndOpen is not defined.");
         }
 
         // Заменяем панель ввода (UI1) на обновленную (UI2)
         const inputPanelContainer = document.getElementById('input-panel');
         if (inputPanelContainer && inputPanelContainer.parentNode) {
+          console.log("Replacing input panel with new version.");
           const newInputPanel = createInputPanel2(messagesContainer);
           inputPanelContainer.parentNode.replaceChild(newInputPanel, inputPanelContainer);
+        } else {
+          console.warn("Input panel container not found.");
         }
       } else {
+        console.error("Unexpected API response, missing plan or bookId:", data);
         messagesContainer.innerHTML = `<div>Произошла ошибка, извините, попробуйте в другой раз</div>`;
       }
     })
@@ -1923,27 +1936,39 @@ function sendCreateBookPlan() {
     .finally(() => {
       isPlanCreationInProgress = false;
       if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+        console.log("Stopping global loading indicator.");
         window.loadingIndicator.stopLoading();
       }
     });
 }
+
+// Функция для добавления новой ячейки книги и открытия её
 function addNewBookToListAndOpen(bookTitle, bookId) {
+  console.log("addNewBookToListAndOpen called with:", bookTitle, bookId);
+
   // Создаем объект новой книги с минимальными данными
   const newBookData = {
     id: bookId,                   // Идентификатор книги
     title: bookTitle,             // Заголовок книги
-    CreateDate: new Date().toISOString(), // Текущая дата в качестве даты создания
-    state: "START"                // Статус книги, например, "START"
+    CreateDate: new Date().toISOString(), // Дата создания
+    state: "START"                // Статус книги
   };
 
-  // Создаем DOM-элемент книги с помощью функции createBookItem
+  // Создаем DOM-элемент книги
   const bookItem = createBookItem(newBookData);
+  console.log("Created bookItem:", bookItem);
 
   // Добавляем элемент в список книг
   const booksList = document.getElementById('books-list');
-  booksList.appendChild(bookItem);
+  if (!booksList) {
+    console.error("Books list container not found.");
+  } else {
+    booksList.appendChild(bookItem);
+    console.log("New book item appended to books list.");
+  }
 
-  // Делаем новую книгу активной, открывая область чата для этой книги
+  // Открываем область чата для этой книги
+  console.log("Opening chat area for bookId:", newBookData.id);
   openBookChatArea(newBookData.id);
 }
 
@@ -2112,7 +2137,6 @@ function startBookGeneration(bookId) {
     const jwtToken = localStorage.getItem('jwtToken');
     const payload = { bookId: bookId };
 
-    // Логирование объекта, который отправляется в API
     console.log("Sending payload to API:", payload);
 
     fetch('https://gurn9gbvb5.execute-api.us-east-2.amazonaws.com/default/startGenerateBook', {
@@ -2124,54 +2148,51 @@ function startBookGeneration(bookId) {
         body: JSON.stringify(payload)
     })
     .then(response => {
+        console.log("Received response with status:", response.status);
         if (response.status === 401) {
-            console.log("Unauthorized - redirecting to login");
+            console.warn("Unauthorized - redirecting to login.");
             window.location.href = 'https://thedisc.xyz/login';
-            return;
+            // Возвращаем отклонённый промис, чтобы следующий then не выполнялся
+            return Promise.reject(new Error('Unauthorized'));
         } else if (response.status === 403) {
-            console.log("Forbidden - redirecting to buy credits");
+            console.warn("Forbidden - redirecting to buy credits.");
             window.location.href = 'https://thedisc.xyz/buy-credit/';
-            return;
+            return Promise.reject(new Error('Forbidden'));
         }
         return response.json();
     })
     .then(data => {
-        console.log('Response from server:', data);
-        if (data.message === 'START') {
-            console.log('Generation started successfully');
-            // Заменяем панель 2 на панель 3 (loading)
+        console.log("Response from server:", data);
+        if (data && data.message === 'START') {
+            console.log("Generation started successfully.");
+
             const bookContent = document.getElementById('book-content');
             const inputPanel = bookContent.querySelector('#input-panel');
             if (inputPanel && inputPanel.parentNode) {
                 const newPanel = createInputPanel3(bookContent);
                 inputPanel.parentNode.replaceChild(newPanel, inputPanel);
+                console.log("Input panel updated to loading panel.");
+            } else {
+                console.warn("Input panel container not found.");
             }
-            // activeBookId = bookId;
-            // if (activeIntervalId) {
-            //     clearInterval(activeIntervalId);
-            //     activeIntervalId = null;
-            // }
-            // startProgressCheck(bookId); //???
-            decreaseCredits(); //???
+            decreaseCredits();
         } else {
-            console.error('Unexpected response:', data);
-            alert('Error: Failed to start book generation');
+            console.error("Unexpected response data:", data);
+            alert("Error: Failed to start book generation");
         }
     })
     .catch(error => {
-        console.error('Error starting generation:', error);
-        alert('Error: Failed to start book generation');
+        // Выводим подробности ошибки
+        console.error("Error starting generation:", error);
+        if (error.response) {
+            console.error("Error response data:", error.response.data);
+        } else {
+            console.error("Error details:", JSON.stringify(error, null, 2));
+        }
+        alert("Error: Failed to start book generation");
     });
 }
-function decreaseCredits() {
-  const creditsElem = document.getElementById('credits');
-  if (creditsElem) {
-    // Предполагаем, что текст имеет формат "Credits: X"
-    let currentCredits = parseInt(creditsElem.textContent.replace('Credits: ', ''), 10) || 0;
-    currentCredits = currentCredits - 1; // уменьшаем на 1
-    creditsElem.textContent = `Credits: ${currentCredits}`;
-  }
-}
+
 
 
 
