@@ -1639,7 +1639,7 @@ function createWordCountSelector() {
     select.style.cursor = "pointer";
     select.style.background = "white";
     
-    const wordCounts = [10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000];
+    const wordCounts = [10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 110000,120000, 130000, 140000, 150000];
     
     wordCounts.forEach(count => {
         const option = document.createElement("option");
@@ -2323,7 +2323,9 @@ function createControlsRow2(messagesArea, textarea, bookData) {
     wordCountDisplay.style.fontSize = "14px";
     wordCountDisplay.style.color = "#64748b";
     wordCountDisplay.style.border = "1px solid #e2e8f0";
-    wordCountDisplay.textContent = "50,000 words";
+    // wordCountDisplay.textContent = "50,000 words";
+    wordCountDisplay.textContent = `${Number(bookData.wordNumber).toLocaleString()} words`;
+
     
     const regenerateBtn = document.createElement("button");
     regenerateBtn.innerHTML = `
@@ -3127,7 +3129,7 @@ function downloadBook(BookID) {
 
 
 //UI5
-function createInputPanel5(messagesArea) {
+function createInputPanel5(messagesArea, bookData) {
     const panel = document.createElement("div");
     panel.style.padding = "40px";
     panel.style.backgroundColor = "#f8fafc";
@@ -3209,7 +3211,7 @@ function createInputPanel5(messagesArea) {
 
     // При нажатии вызываем API для продолжения генерации
     continueBtn.onclick = () => {
-        continueAfterError(bookId);
+        continueAfterError(bookData.BookID);
     };
 
 
@@ -3254,7 +3256,8 @@ function continueAfterError(bookId) {
         console.log('Response from continueAfterError:', data);
         if (data.message === 'CONTINUE') {
             // Если API отвечает положительно, вызываем функцию для создания окна книги
-            createBookWindow(bookId, 'Your book');
+            // createBookWindow(bookId, 'Your book');
+            openBookChatArea(bookId);
         } else {
             alert('Error: Failed to continue book generation.');
         }
