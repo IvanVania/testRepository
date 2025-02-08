@@ -2160,11 +2160,14 @@ function createGenerationHeader(bookData) {
 //START
 function startBookGeneration(bookId) {
     console.log("Start generation for book:", bookId);
-
     const jwtToken = localStorage.getItem('jwtToken');
     const payload = { bookId: bookId };
-
     console.log("Sending payload to API:", payload);
+
+    // Запускаем глобальный индикатор загрузки
+    if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+        window.loadingIndicator.startLoading();
+    }
 
     fetch('https://gurn9gbvb5.execute-api.us-east-2.amazonaws.com/default/startGenerateBook', {
         method: 'POST',
@@ -2179,7 +2182,6 @@ function startBookGeneration(bookId) {
         if (response.status === 401) {
             console.warn("Unauthorized - redirecting to login.");
             window.location.href = 'https://thedisc.xyz/login';
-            // Возвращаем отклонённый промис, чтобы следующий then не выполнялся
             return Promise.reject(new Error('Unauthorized'));
         } else if (response.status === 403) {
             console.warn("Forbidden - redirecting to buy credits.");
@@ -2192,23 +2194,7 @@ function startBookGeneration(bookId) {
         console.log("Response from server:", data);
         if (data && data.message === 'START') {
             console.log("Generation started successfully.");
-
-
-
-
-            // const bookContent = document.getElementById('book-content');
-            // const inputPanel = bookContent.querySelector('#input-panel');
-            // if (inputPanel && inputPanel.parentNode) {
-            //     const newPanel = createInputPanel3(bookContent);
-            //     inputPanel.parentNode.replaceChild(newPanel, inputPanel);
-            //     console.log("Input panel updated to loading panel.");
-            // } else {
-            //     console.warn("Input panel container not found.");
-            // }
-
             openBookChatArea(bookId);
-
-
             decreaseCredits();
         } else {
             console.error("Unexpected response data:", data);
@@ -2216,7 +2202,6 @@ function startBookGeneration(bookId) {
         }
     })
     .catch(error => {
-        // Выводим подробности ошибки
         console.error("Error starting generation:", error);
         if (error.response) {
             console.error("Error response data:", error.response.data);
@@ -2224,7 +2209,27 @@ function startBookGeneration(bookId) {
             console.error("Error details:", JSON.stringify(error, null, 2));
         }
         alert("Error: Failed to start book generation");
+    })
+    .finally(() => {
+        // Останавливаем глобальный индикатор загрузки
+        if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+            window.loadingIndicator.stopLoading();
+        }
     });
+}
+
+//
+function decreaseCredits() {
+  const creditsElem = document.getElementById('credits');
+  if (creditsElem) {
+    // Предполагаем, что текст имеет вид "Credits: X"
+    let currentCredits = parseInt(creditsElem.textContent.replace('Credits: ', ''), 10) || 0;
+    currentCredits--; // уменьшаем на 1
+    creditsElem.textContent = `Credits: ${currentCredits}`;
+    console.log("Credits decreased. New value:", currentCredits);
+  } else {
+    console.warn("Element with id 'credits' not found.");
+  }
 }
 
 
@@ -2555,6 +2560,12 @@ function sendRegenerateBookPlan(bookId) {
 //     return panel;
 // }
 function createInputPanel3(bookData) {
+  // Запускаем глобальный индикатор загрузки
+  if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+    console.log("Global loading indicator started.");
+    window.loadingIndicator.startLoading();
+  }
+
   const panel = document.createElement("div");
   panel.style.padding = "40px";
   panel.style.backgroundColor = "#f8fafc";
@@ -2656,11 +2667,11 @@ function createInputPanel3(bookData) {
   panel.appendChild(statusText);
 
   // --- Логика обновления прогресса ---
-  // Общая длительность симуляции (например, 5 минут для тестирования; замените на 35*60*1000 для реальной длительности)
+  // Общая длительность симуляции (например, 5 минут для тестирования; для реальности замените на 35*60*1000)
   const duration = 5 * 60 * 1000;
   let baseProgress = 0; // Начальное значение прогресса, полученное от API
   let startTime = Date.now();
-  let isFetching = false; // Флаг, чтобы не запускать несколько запросов одновременно
+  let isFetching = false; // Флаг для предотвращения множественных запросов
 
   // Функция вызова API, возвращающая JSON с полями "message" и "progress"
   const fetchProgressFromAPI = () => {
@@ -2685,6 +2696,11 @@ function createInputPanel3(bookData) {
 
   // Изначально вызываем API для получения стартового прогресса
   fetchProgressFromAPI().then(initialData => {
+    // Останавливаем глобальный индикатор загрузки после получения первого ответа
+    if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+      console.log("Global loading indicator stopped after initial progress fetch.");
+      window.loadingIndicator.stopLoading();
+    }
     if (initialData) {
       if (initialData.message === "FINISHED") {
         openBookChatArea(bookData.BookID);
@@ -2708,7 +2724,7 @@ function createInputPanel3(bookData) {
     progressCircle.style.strokeDashoffset = offset;
     percentageText.textContent = `${Math.round(simulatedProgress)}%`;
 
-    // Если достигнут следующий порог и запрос не выполняется, то обновляем через API
+    // Если достигнут следующий порог и запрос не выполняется, обновляем через API
     if (nextThresholdIndex >= 0 && simulatedProgress >= updateThresholds[nextThresholdIndex] && !isFetching) {
       isFetching = true;
       fetchProgressFromAPI().then(data => {
@@ -2728,7 +2744,7 @@ function createInputPanel3(bookData) {
     if (simulatedProgress < 100) {
       requestAnimationFrame(updateProgress);
     } else {
-      // При достижении 100% – выполняем финальную проверку, если запрос не выполняется
+      // Финальная проверка при достижении 100%
       if (!isFetching) {
         isFetching = true;
         fetchProgressFromAPI().then(data => {
@@ -2736,7 +2752,6 @@ function createInputPanel3(bookData) {
           if (data && data.message === "FINISHED") {
             openBookChatArea(bookData.BookID);
           } else if (data) {
-            // Если API возвращает progress < 100, обновляем симуляцию
             baseProgress = parseFloat(data.progress) || 100;
             startTime = Date.now() - (baseProgress / 100 * duration);
             nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
@@ -2751,6 +2766,7 @@ function createInputPanel3(bookData) {
 
   return panel;
 }
+
 
 
 
