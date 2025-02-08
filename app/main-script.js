@@ -431,7 +431,7 @@ function createProfileContainer() {
 
     const profileImg = document.createElement("img");
     profileImg.id = "profile-pic";  //
-    profileImg.src = "https://via.placeholder.com/45";
+    profileImg.src = "https://dummyimage.com/45x45/cccccc/cccccc.png";
     profileImg.style.width = "100%";
     profileImg.style.height = "100%";
     profileImg.style.objectFit = "cover";
