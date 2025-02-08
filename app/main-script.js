@@ -2818,64 +2818,6 @@ function createInputPanel3(messagesArea, bookData) {
 
 
 //UI --- 4 
-// Глобальная переменная для отслеживания процесса загрузки
-let isDownloadInProgress = false;
-
-function downloadBook(bookId) {
-    if (isDownloadInProgress) {
-        console.log("Download already in progress for book:", bookId);
-        return;
-    }
-
-    isDownloadInProgress = true;
-
-    const jwtToken = localStorage.getItem('jwtToken');
-    
-    console.log(`Starting download for book with ID: ${bookId}`);
-    console.log(`JWT Token: ${jwtToken}`);
-
-    const randomId = Math.random().toString(36).substring(2, 15);
-
-    fetch('https://399vji2jze.execute-api.us-east-2.amazonaws.com/default/download-book', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${jwtToken}`
-        },
-        body: JSON.stringify({ BookID: bookId })
-    })
-    .then(response => {
-        console.log('Received response:', response);
-        if (response.status === 401) {
-            window.location.href = 'https://thedisc.xyz/login';
-            return;
-        }
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log('Parsed response data:', data);
-        const downloadUrl = data.downloadUrl;
-        console.log(`Download URL received: ${downloadUrl}`);
-
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `book-ai-${randomId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        console.log('Download initiated successfully.');
-    })
-    .catch(error => {
-        console.error('Error loading book:', error);
-        alert('Failed to download the book.');
-    })
-    .finally(() => {
-        isDownloadInProgress = false;
-    });
-}
 
 function createInputPanel4(messagesArea, bookId) {
     const panel = document.createElement("div");
@@ -2969,7 +2911,64 @@ function createInputPanel4(messagesArea, bookId) {
 
     return panel;
 }
+// Глобальная переменная для отслеживания процесса загрузки
+let isDownloadInProgress = false;
 
+function downloadBook(bookId) {
+    if (isDownloadInProgress) {
+        console.log("Download already in progress for book:", bookId);
+        return;
+    }
+
+    isDownloadInProgress = true;
+
+    const jwtToken = localStorage.getItem('jwtToken');
+    
+    console.log(`Starting download for book with ID: ${bookId}`);
+    console.log(`JWT Token: ${jwtToken}`);
+
+    const randomId = Math.random().toString(36).substring(2, 15);
+
+    fetch('https://tqabehtuci.execute-api.us-east-2.amazonaws.com/default/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify({ BookID: bookId })
+    })
+    .then(response => {
+        console.log('Received response:', response);
+        if (response.status === 401) {
+            window.location.href = 'https://thedisc.xyz/login';
+            return;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Parsed response data:', data);
+        const downloadUrl = data.downloadUrl;
+        console.log(`Download URL received: ${downloadUrl}`);
+
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `book-ai-${randomId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        console.log('Download initiated successfully.');
+    })
+    .catch(error => {
+        console.error('Error loading book:', error);
+        alert('Failed to download the book.');
+    })
+    .finally(() => {
+        isDownloadInProgress = false;
+    });
+}                                                                                                                                                                                                                                                                       
 
 
 
