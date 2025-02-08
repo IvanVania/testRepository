@@ -2912,7 +2912,7 @@ function createInputPanel4(messagesArea, bookData) {
     return panel;
 }
 // Глобальная переменная для отслеживания процесса загрузки
-let isDownloadInProgress = false;
+// let isDownloadInProgress = false;
 
 // function downloadBook(BookID) {
 //     if (isDownloadInProgress) {
