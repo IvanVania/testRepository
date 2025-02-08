@@ -1449,6 +1449,16 @@ function createNewBookChatArea() { //  --- chat area
     const messagesArea = createMessagesArea();
     const divider = createDivider();
     const inputPanel = createInputPanel(messagesArea);
+
+    //
+      // Сброс активных стилей для всех ячеек
+  document.querySelectorAll('[data-book-item]').forEach(item => {
+    applyStyles(item, styles.bookItem);
+  });
+  console.log("Active styles reset for all book items.");
+
+
+
     
     chatArea.appendChild(messagesArea);
     chatArea.appendChild(divider);
@@ -1954,23 +1964,40 @@ function addNewBookToListAndOpen(bookTitle, bookId) {
     state: "START"                // Статус книги
   };
 
-  // Создаем DOM-элемент книги
+  // Создаем DOM-элемент книги с помощью createBookItem
   const bookItem = createBookItem(newBookData);
   console.log("Created bookItem:", bookItem);
 
-  // Добавляем элемент в список книг
+  // Находим контейнер для списка книг
   const booksList = document.getElementById('books-list');
   if (!booksList) {
     console.error("Books list container not found.");
-  } else {
-    booksList.appendChild(bookItem);
-    console.log("New book item appended to books list.");
+    return;
   }
+
+  // Вставляем новую ячейку в начало списка
+  booksList.prepend(bookItem);
+  console.log("New book item prepended to books list.");
+
+  // Сброс активных стилей для всех ячеек
+  document.querySelectorAll('[data-book-item]').forEach(item => {
+    applyStyles(item, styles.bookItem);
+  });
+  console.log("Active styles reset for all book items.");
+
+  // Применяем активное выделение для только что созданной ячейки
+  applyStyles(bookItem, {
+    backgroundColor: '#e0f7fa',         // изменённый фон
+    border: '1px solid #007BFF',         // выделенная граница
+    boxShadow: '0 4px 12px rgba(0, 123, 255, 0.3)' // усиленная тень
+  });
+  console.log("Active style applied to new book item.");
 
   // Открываем область чата для этой книги
   console.log("Opening chat area for bookId:", newBookData.id);
   openBookChatArea(newBookData.id);
 }
+
 
 
 
