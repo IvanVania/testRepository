@@ -1870,7 +1870,7 @@ function sendCreateBookPlan() {
   }
 
 //
-            addMessage(textarea.value); //???
+            // addMessage(textarea.value); //???
 
 
 
@@ -2572,7 +2572,7 @@ function sendRegenerateBookPlan(bookId) {
 
 //     return panel;
 // }
-function createInputPanel3(bookData) {
+function createInputPanel3(messagesArea, bookData) {
   // Логируем переданный объект bookData, чтобы проверить наличие BookID
   console.log("CHEK bookData:", bookData);
   if (!bookData || !bookData.BookID) {
