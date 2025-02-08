@@ -2193,15 +2193,22 @@ function startBookGeneration(bookId) {
         if (data && data.message === 'START') {
             console.log("Generation started successfully.");
 
-            const bookContent = document.getElementById('book-content');
-            const inputPanel = bookContent.querySelector('#input-panel');
-            if (inputPanel && inputPanel.parentNode) {
-                const newPanel = createInputPanel3(bookContent);
-                inputPanel.parentNode.replaceChild(newPanel, inputPanel);
-                console.log("Input panel updated to loading panel.");
-            } else {
-                console.warn("Input panel container not found.");
-            }
+
+
+
+            // const bookContent = document.getElementById('book-content');
+            // const inputPanel = bookContent.querySelector('#input-panel');
+            // if (inputPanel && inputPanel.parentNode) {
+            //     const newPanel = createInputPanel3(bookContent);
+            //     inputPanel.parentNode.replaceChild(newPanel, inputPanel);
+            //     console.log("Input panel updated to loading panel.");
+            // } else {
+            //     console.warn("Input panel container not found.");
+            // }
+
+            openBookChatArea(bookId);
+
+
             decreaseCredits();
         } else {
             console.error("Unexpected response data:", data);
