@@ -2375,20 +2375,20 @@ function sendRegenerateBookPlan(bookId) {
 //     return panel;
 // }
 function createInputPanel3(messagesArea, bookData) {
-    const panel = document.createElement("div");
-    panel.style.padding = "40px";
-    panel.style.backgroundColor = "#f8fafc";
-    panel.style.borderTop = "1px solid #e2e8f0";
-    panel.style.width = "100%";
-    panel.style.boxSizing = "border-box";
-    panel.style.display = "flex";
-    panel.style.flexDirection = "column";
-    panel.style.alignItems = "center";
-    panel.style.justifyContent = "center";
-    panel.style.gap = "24px";
+  const panel = document.createElement("div");
+  panel.style.padding = "40px";
+  panel.style.backgroundColor = "#f8fafc";
+  panel.style.borderTop = "1px solid #e2e8f0";
+  panel.style.width = "100%";
+  panel.style.boxSizing = "border-box";
+  panel.style.display = "flex";
+  panel.style.flexDirection = "column";
+  panel.style.alignItems = "center";
+  panel.style.justifyContent = "center";
+  panel.style.gap = "24px";
 
-    // Добавляем keyframes для анимаций
-    const keyframes = `
+  // Добавляем keyframes для анимаций
+  const keyframes = `
         @keyframes rotate {
             100% { transform: rotate(360deg); }
         }
@@ -2403,167 +2403,175 @@ function createInputPanel3(messagesArea, bookData) {
             100% { transform: scale(1); }
         }
     `;
-    const style = document.createElement('style');
-    style.textContent = keyframes;
-    document.head.appendChild(style);
+  const style = document.createElement('style');
+  style.textContent = keyframes;
+  document.head.appendChild(style);
 
-    // Создаем контейнер для прогресс-круга
-    const progressContainer = document.createElement("div");
-    progressContainer.style.position = "relative";
-    progressContainer.style.width = "120px";
-    progressContainer.style.height = "120px";
-    progressContainer.style.animation = "pulse 2s ease-in-out infinite";
+  // Создаем контейнер для прогресс-круга
+  const progressContainer = document.createElement("div");
+  progressContainer.style.position = "relative";
+  progressContainer.style.width = "120px";
+  progressContainer.style.height = "120px";
+  progressContainer.style.animation = "pulse 2s ease-in-out infinite";
 
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 100 100");
-    svg.style.width = "100%";
-    svg.style.height = "100%";
-    svg.style.transform = "rotate(-90deg)";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.style.width = "100%";
+  svg.style.height = "100%";
+  svg.style.transform = "rotate(-90deg)";
 
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", "50");
-    circle.setAttribute("cy", "50");
-    circle.setAttribute("r", "45");
-    circle.setAttribute("fill", "none");
-    circle.setAttribute("stroke", "#e2e8f0");
-    circle.setAttribute("stroke-width", "8");
+  const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  circle.setAttribute("cx", "50");
+  circle.setAttribute("cy", "50");
+  circle.setAttribute("r", "45");
+  circle.setAttribute("fill", "none");
+  circle.setAttribute("stroke", "#e2e8f0");
+  circle.setAttribute("stroke-width", "8");
 
-    const progressCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    progressCircle.setAttribute("cx", "50");
-    progressCircle.setAttribute("cy", "50");
-    progressCircle.setAttribute("r", "45");
-    progressCircle.setAttribute("fill", "none");
-    progressCircle.setAttribute("stroke", "#3b82f6");
-    progressCircle.setAttribute("stroke-width", "8");
-    progressCircle.setAttribute("stroke-linecap", "round");
-    const circumference = 2 * Math.PI * 45;
-    progressCircle.style.strokeDasharray = `${circumference}`;
-    progressCircle.style.strokeDashoffset = `${circumference}`;
-    progressCircle.style.transition = "stroke-dashoffset 0.5s ease";
+  const progressCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  progressCircle.setAttribute("cx", "50");
+  progressCircle.setAttribute("cy", "50");
+  progressCircle.setAttribute("r", "45");
+  progressCircle.setAttribute("fill", "none");
+  progressCircle.setAttribute("stroke", "#3b82f6");
+  progressCircle.setAttribute("stroke-width", "8");
+  progressCircle.setAttribute("stroke-linecap", "round");
+  const circumference = 2 * Math.PI * 45;
+  progressCircle.style.strokeDasharray = `${circumference}`;
+  progressCircle.style.strokeDashoffset = `${circumference}`;
+  progressCircle.style.transition = "stroke-dashoffset 0.5s ease";
 
-    svg.appendChild(circle);
-    svg.appendChild(progressCircle);
-    progressContainer.appendChild(svg);
+  svg.appendChild(circle);
+  svg.appendChild(progressCircle);
+  progressContainer.appendChild(svg);
 
-    // Текст для отображения процента
-    const percentageText = document.createElement("div");
-    percentageText.style.position = "absolute";
-    percentageText.style.top = "50%";
-    percentageText.style.left = "50%";
-    percentageText.style.transform = "translate(-50%, -50%)";
-    percentageText.style.fontSize = "24px";
-    percentageText.style.fontWeight = "600";
-    percentageText.style.color = "#1e293b";
-    percentageText.style.background = "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)";
-    percentageText.style.webkitBackgroundClip = "text";
-    percentageText.style.webkitTextFillColor = "transparent";
-    percentageText.textContent = "0%";
+  // Текст для отображения процента
+  const percentageText = document.createElement("div");
+  percentageText.style.position = "absolute";
+  percentageText.style.top = "50%";
+  percentageText.style.left = "50%";
+  percentageText.style.transform = "translate(-50%, -50%)";
+  percentageText.style.fontSize = "24px";
+  percentageText.style.fontWeight = "600";
+  percentageText.style.color = "#1e293b";
+  percentageText.style.background = "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)";
+  percentageText.style.webkitBackgroundClip = "text";
+  percentageText.style.webkitTextFillColor = "transparent";
+  percentageText.textContent = "0%";
 
-    progressContainer.appendChild(percentageText);
+  progressContainer.appendChild(percentageText);
 
-    // Текст состояния
-    const statusText = document.createElement("div");
-    statusText.style.fontSize = "18px";
-    statusText.style.fontWeight = "500";
-    statusText.style.color = "#0f172a";
-    statusText.style.textAlign = "center";
-    statusText.innerHTML = `Your book is being generated...<br>
+  // Текст состояния
+  const statusText = document.createElement("div");
+  statusText.style.fontSize = "18px";
+  statusText.style.fontWeight = "500";
+  statusText.style.color = "#0f172a";
+  statusText.style.textAlign = "center";
+  statusText.innerHTML = `Your book is being generated...<br>
         <span style="font-size: 14px; color: #64748b; font-weight: 400">
             Estimated time: 35 minutes remaining
         </span>`;
 
-    panel.appendChild(progressContainer);
-    panel.appendChild(statusText);
+  panel.appendChild(progressContainer);
+  panel.appendChild(statusText);
 
-    // --- Логика обновления прогресса ---
+  // --- Логика обновления прогресса ---
+  // Общая длительность симуляции (например, 5 минут для тестирования; замените на 35*60*1000 для реальной длительности)
+  const duration = 5 * 60 * 1000;
+  let baseProgress = 0; // Начальное значение прогресса, полученное от API
+  let startTime = Date.now();
+  let isFetching = false; // Флаг, чтобы не запускать несколько запросов одновременно
 
-    // Общая длительность симуляции (35 минут)
-    const duration = 5 * 60 * 1000; //35
-    let baseProgress = 0; // Начальный прогресс (полученный от API)
-    let startTime = Date.now();
+  // Функция вызова API, возвращающая JSON с полями "message" и "progress"
+  const fetchProgressFromAPI = () => {
+    return fetch('https://1vwafyp2gj.execute-api.us-east-2.amazonaws.com/default/', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+      },
+      body: JSON.stringify({ BookID: bookData.BookID })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log("Progress API response:", data);
+        return data;
+      })
+      .catch(error => {
+        console.error("Error fetching progress:", error);
+        return null;
+      });
+  };
 
-    // Функция для вызова API, которая возвращает JSON с полями "message" и "progress"
-    const fetchProgressFromAPI = () => {
-        return fetch('https://1vwafyp2gj.execute-api.us-east-2.amazonaws.com/default/', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
-            },
-            body: JSON.stringify({ BookID: bookData.BookID })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Progress API response:", data);
-            return data;
-        })
-        .catch(error => {
-            console.error("Error fetching progress:", error);
-            return null;
-        });
-    };
+  // Изначально вызываем API для получения стартового прогресса
+  fetchProgressFromAPI().then(initialData => {
+    if (initialData) {
+      if (initialData.message === "FINISHED") {
+        openBookChatArea(bookData.BookID);
+        return;
+      }
+      baseProgress = parseFloat(initialData.progress) || 0;
+      startTime = Date.now() - (baseProgress / 100 * duration);
+    }
+  });
 
-    // Изначально вызываем API для получения начального значения прогресса
-    fetchProgressFromAPI().then(initialData => {
-        if (initialData) {
-            if (initialData.message === "FINISHED") {
-                // Если процесс уже завершён – обновляем экран
-                openBookChatArea(bookData.BookID);
-                return;
-            }
-            baseProgress = parseFloat(initialData.progress) || 0;
-            // Перенастраиваем стартовое время так, чтобы симуляция начиналась с полученного значения
+  // Пороговые значения для обновления
+  const updateThresholds = [25, 50, 75, 80, 95, 100];
+  let nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
+
+  const updateProgress = () => {
+    const elapsed = Date.now() - startTime;
+    let simulatedProgress = Math.min((elapsed / duration) * 100, 100);
+    simulatedProgress = Math.max(simulatedProgress, baseProgress);
+
+    const offset = circumference - (simulatedProgress / 100) * circumference;
+    progressCircle.style.strokeDashoffset = offset;
+    percentageText.textContent = `${Math.round(simulatedProgress)}%`;
+
+    // Если достигнут следующий порог и запрос не выполняется, то обновляем через API
+    if (nextThresholdIndex >= 0 && simulatedProgress >= updateThresholds[nextThresholdIndex] && !isFetching) {
+      isFetching = true;
+      fetchProgressFromAPI().then(data => {
+        isFetching = false;
+        if (data) {
+          if (data.message === "FINISHED") {
+            openBookChatArea(bookData.BookID);
+            return;
+          }
+          baseProgress = parseFloat(data.progress) || simulatedProgress;
+          startTime = Date.now() - (baseProgress / 100 * duration);
+          nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
+        }
+      });
+    }
+
+    if (simulatedProgress < 100) {
+      requestAnimationFrame(updateProgress);
+    } else {
+      // При достижении 100% – выполняем финальную проверку, если запрос не выполняется
+      if (!isFetching) {
+        isFetching = true;
+        fetchProgressFromAPI().then(data => {
+          isFetching = false;
+          if (data && data.message === "FINISHED") {
+            openBookChatArea(bookData.BookID);
+          } else if (data) {
+            // Если API возвращает progress < 100, обновляем симуляцию
+            baseProgress = parseFloat(data.progress) || 100;
             startTime = Date.now() - (baseProgress / 100 * duration);
-        }
-    });
-
-    // Пороговые значения, при достижении которых повторно вызываем API для обновления прогресса
-    const updateThresholds = [25, 50, 75, 80, 95, 100];
-    let nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
-
-    const updateProgress = () => {
-        const elapsed = Date.now() - startTime;
-        let simulatedProgress = Math.min((elapsed / duration) * 100, 100);
-        // Если базовый прогресс выше, то симуляция не опускается ниже него
-        simulatedProgress = Math.max(simulatedProgress, baseProgress);
-
-        const offset = circumference - (simulatedProgress / 100) * circumference;
-        progressCircle.style.strokeDashoffset = offset;
-        percentageText.textContent = `${Math.round(simulatedProgress)}%`;
-
-        // Если достигнут следующий порог – вызываем API для уточнения прогресса
-        if (nextThresholdIndex >= 0 && simulatedProgress >= updateThresholds[nextThresholdIndex]) {
-            fetchProgressFromAPI().then(data => {
-                if (data) {
-                    if (data.message === "FINISHED") {
-                        // Если API сообщает, что процесс завершён, обновляем экран
-                        openBookChatArea(bookData.BookID);
-                        return;
-                    }
-                    baseProgress = parseFloat(data.progress) || simulatedProgress;
-                    // Перенастраиваем стартовое время, чтобы симуляция продолжалась от нового значения
-                    startTime = Date.now() - (baseProgress / 100 * duration);
-                    nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
-                }
-            });
-        }
-
-        if (simulatedProgress < 100) {
+            nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
             requestAnimationFrame(updateProgress);
-        } else {
-            // При достижении 100% – финальная проверка через API
-            fetchProgressFromAPI().then(data => {
-                if (data && data.message === "FINISHED") {
-                    openBookChatArea(bookData.BookID);
-                }
-            });
-        }
-    };
+          }
+        });
+      }
+    }
+  };
 
-    requestAnimationFrame(updateProgress);
+  requestAnimationFrame(updateProgress);
 
-    return panel;
+  return panel;
 }
+
 
 
 
