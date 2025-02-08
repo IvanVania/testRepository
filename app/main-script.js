@@ -1736,6 +1736,103 @@ function createActionButtons(messagesArea, textarea) {
 let isPlanCreationInProgress = false;
 
 // Функция для отправки запроса на создание плана книги
+// function sendCreateBookPlan() {
+//   if (isPlanCreationInProgress) {
+//     console.log("Plan creation already in progress.");
+//     return;
+//   }
+//   isPlanCreationInProgress = true;
+
+//   // Получаем значения из полей ввода
+//   const textarea = document.getElementById("chat-text-input"); // Получаем textarea по id
+//   const wordNumberSelect = document.getElementById("word-count-selector"); // Получаем select по id
+//   const requestText = textarea.value.trim(); // Получаем текст из textarea
+//   const wordNumber = parseInt(wordNumberSelect.value, 10); // Получаем выбранное количество слов
+
+//   if (!requestText) {
+//     isPlanCreationInProgress = false;
+//     return;
+//   }
+
+//   // Формируем объект запроса (payload)
+//   const payload = {
+//     RequestText: requestText,
+//     WordNumber: wordNumber
+//   };
+//   console.log('Data sent:', payload);
+
+//   // Получаем контейнер для сообщений (где выводятся результаты API)
+//   const messagesContainer = document.getElementById('chat-messages-area'); // Исправлено на правильный id
+//   // Очищаем контейнер и добавляем спиннер (элемент с классом "loading-spinner")
+//   messagesContainer.innerHTML = '';
+//   const spinner = document.createElement('div');
+//   spinner.className = 'loading-spinner';
+//   messagesContainer.appendChild(spinner);
+
+//   // Очищаем поле ввода и сбрасываем высоту textarea
+//   textarea.value = '';
+//   textarea.style.height = '100px';
+
+//   // Запускаем индикатор загрузки
+//   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+//     window.loadingIndicator.startLoading();
+//   }
+
+//   // Отправляем API-запрос на URL (заменён на новый URL)
+//   fetch('https://l71ibhfxdj.execute-api.us-east-2.amazonaws.com/default/', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+//     },
+//     body: JSON.stringify(payload)
+//   })
+//     .then(response => {
+//       if (response.status === 401) {
+//         window.location.href = 'https://thedisc.xyz/login';
+//         throw new Error('Unauthorized');
+//       }
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+//       return response.json();
+//     })
+//     .then(data => {
+//       // Удаляем спиннер из контейнера сообщений
+//       messagesContainer.innerHTML = '';
+
+//       if (data.plan) {
+//         // Добавляем полученный план в область сообщений
+//         addMessage(messagesContainer, data.plan);
+
+//         // Если функция addNewBookToListAndOpen определена – добавляем новую книгу в список и открываем её
+//         if (typeof addNewBookToListAndOpen === 'function') {
+//           addNewBookToListAndOpen(data.bookTitle || 'New Book', data.bookId);
+//         }
+
+//         // Заменяем текущую панель ввода (UI1) на UI2
+//         const inputPanelContainer = document.getElementById('input-panel');
+//         if (inputPanelContainer && inputPanelContainer.parentNode) {
+//           const newInputPanel = createInputPanel2(messagesContainer);
+//           inputPanelContainer.parentNode.replaceChild(newInputPanel, inputPanelContainer);
+//         }
+//       } else {
+//         // Если API вернуло ошибку или неожиданный ответ
+//         messagesContainer.innerHTML = `<div>Произошла ошибка, извините, попробуйте в другой раз</div>`;
+//       }
+//     })
+//     .catch(error => {
+//       console.error('API error:', error);
+//       messagesContainer.innerHTML = `<div>Произошла ошибка, извините, попробуйте в другой раз</div>`;
+//     })
+//     .finally(() => {
+//       isPlanCreationInProgress = false;
+//       // Останавливаем индикатор загрузки
+//       if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+//         window.loadingIndicator.stopLoading();
+//       }
+//     });
+// }
 function sendCreateBookPlan() {
   if (isPlanCreationInProgress) {
     console.log("Plan creation already in progress.");
@@ -1744,32 +1841,31 @@ function sendCreateBookPlan() {
   isPlanCreationInProgress = true;
 
   // Получаем значения из полей ввода
-  const textarea = document.getElementById("chat-text-input"); // Получаем textarea по id
-  const wordNumberSelect = document.getElementById("word-count-selector"); // Получаем select по id
-  const requestText = textarea.value.trim(); // Получаем текст из textarea
-  const wordNumber = parseInt(wordNumberSelect.value, 10); // Получаем выбранное количество слов
+  const textarea = document.getElementById("chat-text-input");
+  const wordNumberSelect = document.getElementById("word-count-selector");
+  const requestText = textarea.value.trim();
+  const wordNumber = parseInt(wordNumberSelect.value, 10);
 
   if (!requestText) {
     isPlanCreationInProgress = false;
     return;
   }
 
-  // Формируем объект запроса (payload)
+  // Формируем объект запроса
   const payload = {
     RequestText: requestText,
     WordNumber: wordNumber
   };
   console.log('Data sent:', payload);
 
-  // Получаем контейнер для сообщений (где выводятся результаты API)
-  const messagesContainer = document.getElementById('chat-messages-area'); // Исправлено на правильный id
-  // Очищаем контейнер и добавляем спиннер (элемент с классом "loading-spinner")
+  // Получаем контейнер для сообщений и добавляем спиннер
+  const messagesContainer = document.getElementById('chat-messages-area');
   messagesContainer.innerHTML = '';
   const spinner = document.createElement('div');
   spinner.className = 'loading-spinner';
   messagesContainer.appendChild(spinner);
 
-  // Очищаем поле ввода и сбрасываем высоту textarea
+  // Очищаем поле ввода
   textarea.value = '';
   textarea.style.height = '100px';
 
@@ -1778,7 +1874,7 @@ function sendCreateBookPlan() {
     window.loadingIndicator.startLoading();
   }
 
-  // Отправляем API-запрос на URL (заменён на новый URL)
+  // Отправляем API-запрос
   fetch('https://l71ibhfxdj.execute-api.us-east-2.amazonaws.com/default/', {
     method: 'POST',
     headers: {
@@ -1798,26 +1894,25 @@ function sendCreateBookPlan() {
       return response.json();
     })
     .then(data => {
-      // Удаляем спиннер из контейнера сообщений
+      // Убираем спиннер
       messagesContainer.innerHTML = '';
 
-      if (data.plan) {
-        // Добавляем полученный план в область сообщений
+      if (data.plan && data.bookId) {
+        // Выводим план книги в область сообщений
         addMessage(messagesContainer, data.plan);
 
-        // Если функция addNewBookToListAndOpen определена – добавляем новую книгу в список и открываем её
+        // Добавляем новую ячейку книги и делаем её активной
         if (typeof addNewBookToListAndOpen === 'function') {
           addNewBookToListAndOpen(data.bookTitle || 'New Book', data.bookId);
         }
 
-        // Заменяем текущую панель ввода (UI1) на UI2
+        // Заменяем панель ввода (UI1) на обновленную (UI2)
         const inputPanelContainer = document.getElementById('input-panel');
         if (inputPanelContainer && inputPanelContainer.parentNode) {
           const newInputPanel = createInputPanel2(messagesContainer);
           inputPanelContainer.parentNode.replaceChild(newInputPanel, inputPanelContainer);
         }
       } else {
-        // Если API вернуло ошибку или неожиданный ответ
         messagesContainer.innerHTML = `<div>Произошла ошибка, извините, попробуйте в другой раз</div>`;
       }
     })
@@ -1827,12 +1922,33 @@ function sendCreateBookPlan() {
     })
     .finally(() => {
       isPlanCreationInProgress = false;
-      // Останавливаем индикатор загрузки
       if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
         window.loadingIndicator.stopLoading();
       }
     });
 }
+function addNewBookToListAndOpen(bookTitle, bookId) {
+  // Создаем объект новой книги с минимальными данными
+  const newBookData = {
+    id: bookId,                   // Идентификатор книги
+    title: bookTitle,             // Заголовок книги
+    CreateDate: new Date().toISOString(), // Текущая дата в качестве даты создания
+    state: "START"                // Статус книги, например, "START"
+  };
+
+  // Создаем DOM-элемент книги с помощью функции createBookItem
+  const bookItem = createBookItem(newBookData);
+
+  // Добавляем элемент в список книг
+  const booksList = document.getElementById('books-list');
+  booksList.appendChild(bookItem);
+
+  // Делаем новую книгу активной, открывая область чата для этой книги
+  openBookChatArea(newBookData.id);
+}
+
+
+
 
 
 
@@ -2030,12 +2146,12 @@ function startBookGeneration(bookId) {
                 const newPanel = createInputPanel3(bookContent);
                 inputPanel.parentNode.replaceChild(newPanel, inputPanel);
             }
-            activeBookId = bookId;
-            if (activeIntervalId) {
-                clearInterval(activeIntervalId);
-                activeIntervalId = null;
-            }
-            startProgressCheck(bookId); //???
+            // activeBookId = bookId;
+            // if (activeIntervalId) {
+            //     clearInterval(activeIntervalId);
+            //     activeIntervalId = null;
+            // }
+            // startProgressCheck(bookId); //???
             decreaseCredits(); //???
         } else {
             console.error('Unexpected response:', data);
@@ -2046,6 +2162,15 @@ function startBookGeneration(bookId) {
         console.error('Error starting generation:', error);
         alert('Error: Failed to start book generation');
     });
+}
+function decreaseCredits() {
+  const creditsElem = document.getElementById('credits');
+  if (creditsElem) {
+    // Предполагаем, что текст имеет формат "Credits: X"
+    let currentCredits = parseInt(creditsElem.textContent.replace('Credits: ', ''), 10) || 0;
+    currentCredits = currentCredits - 1; // уменьшаем на 1
+    creditsElem.textContent = `Credits: ${currentCredits}`;
+  }
 }
 
 
