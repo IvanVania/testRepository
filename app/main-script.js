@@ -1954,12 +1954,12 @@ function sendCreateBookPlan() {
 
 // Функция для добавления новой ячейки книги и открытия её
 function addNewBookToListAndOpen(bookTitle, bookId) {
-  console.log("addNewBookToListAndOpen called with:", bookTitle, bookId);
+  console.log("SUKA TITLE addNewBookToListAndOpen called with:", bookTitle, title, bookId);
 
   // Создаем объект новой книги с минимальными данными
   const newBookData = {
     id: bookId,                   // Идентификатор книги
-    title: bookTitle,             // Заголовок книги
+    title: title, //bookTitle,             // Заголовок книги
     CreateDate: new Date().toISOString(), // Дата создания
     state: "START"                // Статус книги
   };
