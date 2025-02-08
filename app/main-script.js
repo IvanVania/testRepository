@@ -2819,7 +2819,7 @@ function createInputPanel3(messagesArea, bookData) {
 
 //UI --- 4 
 
-function createInputPanel4(messagesArea, bookId) {
+function createInputPanel4(messagesArea, bookData) {
     const panel = document.createElement("div");
     panel.style.padding = "40px";
     panel.style.backgroundColor = "#f8fafc";
@@ -2903,7 +2903,7 @@ function createInputPanel4(messagesArea, bookId) {
 
     // При нажатии вызываем API для загрузки книги
     downloadBtn.onclick = () => {
-        downloadBook(bookId);
+        downloadBook(bookData.BookID);
     };
 
     panel.appendChild(message);
@@ -2914,9 +2914,9 @@ function createInputPanel4(messagesArea, bookId) {
 // Глобальная переменная для отслеживания процесса загрузки
 let isDownloadInProgress = false;
 
-function downloadBook(bookId) {
+function downloadBook(BookID) {
     if (isDownloadInProgress) {
-        console.log("Download already in progress for book:", bookId);
+        console.log("Download already in progress for book:", BookID);
         return;
     }
 
@@ -2924,7 +2924,7 @@ function downloadBook(bookId) {
 
     const jwtToken = localStorage.getItem('jwtToken');
     
-    console.log(`Starting download for book with ID: ${bookId}`);
+    console.log(`Starting download for book with ID: ${BookID}`);
     console.log(`JWT Token: ${jwtToken}`);
 
     const randomId = Math.random().toString(36).substring(2, 15);
@@ -2935,7 +2935,7 @@ function downloadBook(bookId) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${jwtToken}`
         },
-        body: JSON.stringify({ BookID: bookId })
+        body: JSON.stringify({ BookID: BookID })
     })
     .then(response => {
         console.log('Received response:', response);
