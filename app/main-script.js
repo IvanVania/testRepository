@@ -2547,7 +2547,7 @@ function sendRegenerateBookPlan(bookId) {
 
 //     return panel;
 // }
-function createInputPanel3(messagesArea, bookData) {
+function createInputPanel3(bookData) {
   const panel = document.createElement("div");
   panel.style.padding = "40px";
   panel.style.backgroundColor = "#f8fafc";
