@@ -1974,7 +1974,7 @@ function addNewBookToListAndOpen(title, bookId) {
     id: bookId,                   // Идентификатор книги
     title: title, //bookTitle,             // Заголовок книги
     CreateDate: new Date().toISOString(), // Дата создания
-    state: "START"                // Статус книги
+    state: "NULL"                // Статус книги
   };
 
   // Создаем DOM-элемент книги с помощью createBookItem
@@ -2581,7 +2581,7 @@ function createInputPanel3(messagesArea, bookData) {
 
   // Запускаем глобальный индикатор загрузки
   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
-    console.log("Global loading indicator started.");
+    // console.log("Global loading indicator started.");
     window.loadingIndicator.startLoading();
   } else {
     console.warn("Global loading indicator is not defined or does not have startLoading().");
@@ -2718,17 +2718,17 @@ function createInputPanel3(messagesArea, bookData) {
   // Изначально получаем стартовый прогресс
   fetchProgressFromAPI().then(initialData => {
     if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
-      console.log("Global loading indicator stopped after initial progress fetch.");
+      // console.log("Global loading indicator stopped after initial progress fetch.");
       window.loadingIndicator.stopLoading();
     }
     if (initialData) {
       if (initialData.message === "FINISHED") {
-        console.log("Generation finished on initial API call. Opening chat area.");
+        // console.log("Generation finished on initial API call. Opening chat area.");
         openBookChatArea(bookData.BookID);
         return;
       }
       baseProgress = parseFloat(initialData.progress) || 0;
-      console.log("Initial progress:", baseProgress);
+      // console.log("Initial progress:", baseProgress);
       startTime = Date.now() - (baseProgress / 100 * duration);
     }
   });
@@ -2746,22 +2746,22 @@ function createInputPanel3(messagesArea, bookData) {
     progressCircle.style.strokeDashoffset = offset;
     percentageText.textContent = `${Math.round(simulatedProgress)}%`;
 
-    console.log("Simulated progress:", simulatedProgress, "Base progress:", baseProgress);
+    // console.log("Simulated progress:", simulatedProgress, "Base progress:", baseProgress);
 
     // Если достигнут следующий порог, и запрос не выполняется, обновляем прогресс через API
     if (nextThresholdIndex >= 0 && simulatedProgress >= updateThresholds[nextThresholdIndex] && !isFetching) {
-      console.log(`Threshold ${updateThresholds[nextThresholdIndex]}% reached. Fetching update...`);
+      // console.log(`Threshold ${updateThresholds[nextThresholdIndex]}% reached. Fetching update...`);
       isFetching = true;
       fetchProgressFromAPI().then(data => {
         isFetching = false;
         if (data) {
           if (data.message === "FINISHED") {
-            console.log("Generation finished per API. Opening chat area.");
+            // console.log("Generation finished per API. Opening chat area.");
             openBookChatArea(bookData.BookID);
             return;
           }
           baseProgress = parseFloat(data.progress) || simulatedProgress;
-          console.log("Updated base progress from API:", baseProgress);
+          // console.log("Updated base progress from API:", baseProgress);
           startTime = Date.now() - (baseProgress / 100 * duration);
           nextThresholdIndex = updateThresholds.findIndex(th => th > baseProgress);
         }
@@ -2777,7 +2777,7 @@ function createInputPanel3(messagesArea, bookData) {
         fetchProgressFromAPI().then(data => {
           isFetching = false;
           if (data && data.message === "FINISHED") {
-            console.log("Final API check: Generation finished. Opening chat area.");
+            // console.log("Final API check: Generation finished. Opening chat area.");
             openBookChatArea(bookData.BookID);
           } else if (data) {
             baseProgress = parseFloat(data.progress) || 100;
