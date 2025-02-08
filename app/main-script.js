@@ -2681,10 +2681,11 @@ function createInputPanel3(messagesArea, bookData) {
   statusText.style.textAlign = "center";
   statusText.innerHTML = `Your book is being generated...<br>
         <span style="font-size: 14px; color: #64748b; font-weight: 400">
-            Estimated time: 35 minutes remaining
+            
+        Average generation time 10-15 minutes
         </span>`;
 
-  panel.appendChild(progressContainer);
+  panel.appendChild(progressContainer); // Estimated time: 35 minutes remaining
   panel.appendChild(statusText);
 
   // --- Логика обновления прогресса ---
@@ -2817,7 +2818,66 @@ function createInputPanel3(messagesArea, bookData) {
 
 
 //UI --- 4 
-function createInputPanel4(messagesArea) {
+// Глобальная переменная для отслеживания процесса загрузки
+let isDownloadInProgress = false;
+
+function downloadBook(bookId) {
+    if (isDownloadInProgress) {
+        console.log("Download already in progress for book:", bookId);
+        return;
+    }
+
+    isDownloadInProgress = true;
+
+    const jwtToken = localStorage.getItem('jwtToken');
+    
+    console.log(`Starting download for book with ID: ${bookId}`);
+    console.log(`JWT Token: ${jwtToken}`);
+
+    const randomId = Math.random().toString(36).substring(2, 15);
+
+    fetch('https://399vji2jze.execute-api.us-east-2.amazonaws.com/default/download-book', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify({ BookID: bookId })
+    })
+    .then(response => {
+        console.log('Received response:', response);
+        if (response.status === 401) {
+            window.location.href = 'https://thedisc.xyz/login';
+            return;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Parsed response data:', data);
+        const downloadUrl = data.downloadUrl;
+        console.log(`Download URL received: ${downloadUrl}`);
+
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `book-ai-${randomId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        console.log('Download initiated successfully.');
+    })
+    .catch(error => {
+        console.error('Error loading book:', error);
+        alert('Failed to download the book.');
+    })
+    .finally(() => {
+        isDownloadInProgress = false;
+    });
+}
+
+function createInputPanel4(messagesArea, bookId) {
     const panel = document.createElement("div");
     panel.style.padding = "40px";
     panel.style.backgroundColor = "#f8fafc";
@@ -2830,7 +2890,7 @@ function createInputPanel4(messagesArea) {
     panel.style.justifyContent = "center";
     panel.style.gap = "24px";
 
-    // Success message
+    // Сообщение об успехе
     const message = document.createElement("div");
     message.style.fontSize = "24px";
     message.style.fontWeight = "600";
@@ -2842,7 +2902,7 @@ function createInputPanel4(messagesArea) {
     message.textContent = "Your book is ready";
     message.style.animation = "fadeIn 0.5s ease-out";
 
-    // Download button
+    // Кнопка загрузки
     const downloadBtn = document.createElement("button");
     downloadBtn.innerHTML = `
         <svg style="width: 20px; height: 20px; margin-right: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -2868,7 +2928,7 @@ function createInputPanel4(messagesArea) {
     downloadBtn.style.background = "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)";
     downloadBtn.style.animation = "fadeIn 0.5s ease-out 0.2s backwards";
 
-    // Add keyframes
+    // Добавляем keyframes для анимаций
     const keyframes = `
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -2884,7 +2944,7 @@ function createInputPanel4(messagesArea) {
     style.textContent = keyframes;
     document.head.appendChild(style);
 
-    // Button hover effects
+    // Эффекты при наведении
     downloadBtn.onmouseover = () => {
         downloadBtn.style.transform = "translateY(-2px)";
         downloadBtn.style.boxShadow = "0 8px 20px rgba(59, 130, 246, 0.35)";
@@ -2899,9 +2959,9 @@ function createInputPanel4(messagesArea) {
         downloadBtn.style.animation = "none";
     };
 
+    // При нажатии вызываем API для загрузки книги
     downloadBtn.onclick = () => {
-        // Add download functionality here
-        console.log("Downloading book...");
+        downloadBook(bookId);
     };
 
     panel.appendChild(message);
@@ -2909,6 +2969,37 @@ function createInputPanel4(messagesArea) {
 
     return panel;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2993,6 +3084,14 @@ function createInputPanel5(messagesArea) {
         continueBtn.style.background = "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)";
     };
 
+
+    // При нажатии вызываем API для продолжения генерации
+    continueBtn.onclick = () => {
+        continueAfterError(bookId);
+    };
+
+
+
     panel.appendChild(icon);
     panel.appendChild(message);
     panel.appendChild(subMessage);
@@ -3008,6 +3107,41 @@ function createInputPanel5(messagesArea) {
 
 
 
+function continueAfterError(bookId) {
+    const jwtToken = localStorage.getItem('jwtToken');
+    
+    fetch('https://auqh8afmpc.execute-api.us-east-2.amazonaws.com/default/start-after-error-continue', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify({ bookId: bookId })
+    })
+    .then(response => {
+        if (response.status === 401) {
+            window.location.href = 'https://thedisc.xyz/login'; // 401 Unauthorized
+            return;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response from continueAfterError:', data);
+        if (data.message === 'CONTINUE') {
+            // Если API отвечает положительно, вызываем функцию для создания окна книги
+            createBookWindow(bookId, 'Your book');
+        } else {
+            alert('Error: Failed to continue book generation.');
+        }
+    })
+    .catch(error => {
+        console.error('Error continuing generation:', error);
+        alert('Error: Failed to continue book generation.');
+    });
+}
 
 
 
