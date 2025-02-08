@@ -1966,13 +1966,68 @@ function sendCreateBookPlan() {
 }
 
 // Функция для добавления новой ячейки книги и открытия её
+
+// function addNewBookToListAndOpen(title, bookId) {
+//   console.log("SUKA TITLE addNewBookToListAndOpen called with:", title, bookId);
+
+//   // Создаем объект новой книги с минимальными данными
+//   const newBookData = {
+//     id: bookId,                   // Идентификатор книги
+//     title: title, //bookTitle,             // Заголовок книги
+//     CreateDate: new Date().toISOString(), // Дата создания
+//     state: "NULL"                // Статус книги
+//   };
+
+//   // Создаем DOM-элемент книги с помощью createBookItem
+//   const bookItem = createBookItem(newBookData);
+//   console.log("Created bookItem:", bookItem);
+
+//   // Находим контейнер для списка книг
+//   const booksList = document.getElementById('books-list');
+//   if (!booksList) {
+//     console.error("Books list container not found.");
+//     return;
+//   }
+
+//   // Вставляем новую ячейку в начало списка
+//   booksList.prepend(bookItem);
+//   console.log("New book item prepended to books list.");
+
+//   // Сброс активных стилей для всех ячеек
+//   document.querySelectorAll('[data-book-item]').forEach(item => {
+//     applyStyles(item, styles.bookItem);
+//   });
+//   console.log("Active styles reset for all book items.");
+
+//   // Применяем активное выделение для только что созданной ячейки
+//   applyStyles(bookItem, {
+//     backgroundColor: '#e0f7fa',         // изменённый фон
+//     border: '1px solid #007BFF',         // выделенная граница
+//     boxShadow: '0 4px 12px rgba(0, 123, 255, 0.3)' // усиленная тень
+//   });
+//   console.log("Active style applied to new book item.");
+
+//   // Открываем область чата для этой книги
+//   console.log("Opening chat area for bookId:", newBookData.id);
+//   openBookChatArea(newBookData.id);
+// }
 function addNewBookToListAndOpen(title, bookId) {
   console.log("SUKA TITLE addNewBookToListAndOpen called with:", title, bookId);
 
-  // Создаем объект новой книги с минимальными данными
+  // Удаляем уникальный суффикс, если он есть (ожидается, что суффикс имеет формат _xxxx, где xxxx — 4 символа)
+  let cleanTitle = title;
+  const lastUnderscoreIndex = title.lastIndexOf('_');
+  if (lastUnderscoreIndex !== -1 && title.length - lastUnderscoreIndex - 1 === 4) {
+    cleanTitle = title.substring(0, lastUnderscoreIndex);
+    console.log("Unique suffix removed. Clean title:", cleanTitle);
+  } else {
+    console.log("Unique suffix not detected. Using title as is.");
+  }
+
+  // Создаем объект новой книги с минимальными данными, используя очищенный заголовок
   const newBookData = {
     id: bookId,                   // Идентификатор книги
-    title: title, //bookTitle,             // Заголовок книги
+    title: cleanTitle,            // Заголовок книги без уникального суффикса
     CreateDate: new Date().toISOString(), // Дата создания
     state: "NULL"                // Статус книги
   };
