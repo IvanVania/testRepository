@@ -660,7 +660,7 @@ function openNewChatArea() {
 // Здесь должна быть функция, создающая область для создания книги
 function createNewBookChatArea() {
     const area = document.createElement("div");
-    area.textContent = "Создание новой книги...";
+    area.textContent = "Creating a new book...";
     // Добавьте нужную логику и стили
     return area;
 }
@@ -870,142 +870,337 @@ function applyStyles(element, styleObj) {
 }
 
 // Функция создания элемента книги на основе полученных данных с сервера
-function createBookItem(bookData) {
-    const book = document.createElement("div");
-    applyStyles(book, styles.bookItem);
+// function createBookItem(bookData) {
+//     const book = document.createElement("div");
+//     applyStyles(book, styles.bookItem);
     
-    const content = document.createElement("div");
-    applyStyles(content, styles.bookContent);
+//     const content = document.createElement("div");
+//     applyStyles(content, styles.bookContent);
     
-    // Верхняя строка с заголовком и метаданными
-    const topRow = document.createElement("div");
-    applyStyles(topRow, styles.topRow);
+//     // Верхняя строка с заголовком и метаданными
+//     const topRow = document.createElement("div");
+//     applyStyles(topRow, styles.topRow);
     
-    const titleContainer = document.createElement("div");
-    applyStyles(titleContainer, styles.titleContainer);
+//     const titleContainer = document.createElement("div");
+//     applyStyles(titleContainer, styles.titleContainer);
     
-    const title = document.createElement("div");
-    applyStyles(title, styles.title);
-    title.textContent = bookData.title;
+//     const title = document.createElement("div");
+//     applyStyles(title, styles.title);
+//     title.textContent = bookData.title;
     
-    const metadata = document.createElement("div");
-    applyStyles(metadata, styles.metadata);
+//     const metadata = document.createElement("div");
+//     applyStyles(metadata, styles.metadata);
     
-    const dateContainer = document.createElement("div");
-    applyStyles(dateContainer, styles.dateContainer);
+//     const dateContainer = document.createElement("div");
+//     applyStyles(dateContainer, styles.dateContainer);
     
-    const date = document.createElement("div");
-    applyStyles(date, styles.date);
-    date.textContent = formatDate(bookData.CreateDate);
+//     const date = document.createElement("div");
+//     applyStyles(date, styles.date);
+//     date.textContent = formatDate(bookData.CreateDate);
     
-    const menuTrigger = document.createElement("div");
-    applyStyles(menuTrigger, styles.menuTrigger);
-    menuTrigger.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="color: #94a3b8">
-            <circle cx="8" cy="2" r="1.5"/>
-            <circle cx="8" cy="8" r="1.5"/>
-            <circle cx="8" cy="14" r="1.5"/>
-        </svg>
-    `;
+//     const menuTrigger = document.createElement("div");
+//     applyStyles(menuTrigger, styles.menuTrigger);
+//     menuTrigger.innerHTML = `
+//         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="color: #94a3b8">
+//             <circle cx="8" cy="2" r="1.5"/>
+//             <circle cx="8" cy="8" r="1.5"/>
+//             <circle cx="8" cy="14" r="1.5"/>
+//         </svg>
+//     `;
     
-    const dropdown = document.createElement("div");
-    applyStyles(dropdown, styles.dropdownMenu);
+//     const dropdown = document.createElement("div");
+//     applyStyles(dropdown, styles.dropdownMenu);
     
-    const deleteBtn = document.createElement("div");
-    applyStyles(deleteBtn, styles.deleteButton);
-    deleteBtn.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-        </svg>
-        Delete Book
-    `;
+//     const deleteBtn = document.createElement("div");
+//     applyStyles(deleteBtn, styles.deleteButton);
+//     deleteBtn.innerHTML = `
+//         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+//             <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+//         </svg>
+//         Delete Book
+//     `;
     
-    titleContainer.appendChild(title);
-    dateContainer.appendChild(date);
-    metadata.appendChild(dateContainer);
-    metadata.appendChild(menuTrigger);
+//     titleContainer.appendChild(title);
+//     dateContainer.appendChild(date);
+//     metadata.appendChild(dateContainer);
+//     metadata.appendChild(menuTrigger);
     
-    topRow.appendChild(titleContainer);
-    topRow.appendChild(metadata);
+//     topRow.appendChild(titleContainer);
+//     topRow.appendChild(metadata);
     
-    content.appendChild(topRow);
+//     content.appendChild(topRow);
     
-    // Если есть статус книги, добавляем индикатор
-    const statusIndicator = createStatusIndicator(bookData.state);
-    if (statusIndicator) {
-        content.appendChild(statusIndicator);
-    }
+//     // Если есть статус книги, добавляем индикатор
+//     const statusIndicator = createStatusIndicator(bookData.state);
+//     if (statusIndicator) {
+//         content.appendChild(statusIndicator);
+//     }
     
-    book.appendChild(content);
+//     book.appendChild(content);
     
-    // Hover эффекты
-    book.onmouseover = () => {
-        applyStyles(book, {
-            backgroundColor: '#f8fafc',
-            transform: 'translateX(5px)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
-        });
-    };
-    book.onmouseout = () => {
-        applyStyles(book, {
-            backgroundColor: 'white',
-            transform: 'none',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)'
-        });
-    };
-    menuTrigger.onmouseover = () => {
-        applyStyles(menuTrigger, { backgroundColor: '#f1f5f9' });
-    };
-    menuTrigger.onmouseout = () => {
-        applyStyles(menuTrigger, { backgroundColor: 'transparent' });
-    };
-    deleteBtn.onmouseover = () => {
-        applyStyles(deleteBtn, { backgroundColor: '#fef2f2' });
-    };
-    deleteBtn.onmouseout = () => {
-        applyStyles(deleteBtn, { backgroundColor: 'transparent' });
-    };
+//     // Hover эффекты
+//     book.onmouseover = () => {
+//         applyStyles(book, {
+//             backgroundColor: '#f8fafc',
+//             transform: 'translateX(5px)',
+//             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+//         });
+//     };
+//     book.onmouseout = () => {
+//         applyStyles(book, {
+//             backgroundColor: 'white',
+//             transform: 'none',
+//             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)'
+//         });
+//     };
+//     menuTrigger.onmouseover = () => {
+//         applyStyles(menuTrigger, { backgroundColor: '#f1f5f9' });
+//     };
+//     menuTrigger.onmouseout = () => {
+//         applyStyles(menuTrigger, { backgroundColor: 'transparent' });
+//     };
+//     deleteBtn.onmouseover = () => {
+//         applyStyles(deleteBtn, { backgroundColor: '#fef2f2' });
+//     };
+//     deleteBtn.onmouseout = () => {
+//         applyStyles(deleteBtn, { backgroundColor: 'transparent' });
+//     };
     
-    // Обработчики кликов
-    deleteBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (confirm("Are you sure you want to delete this book?")) {
-            book.remove();
-        }
-        dropdown.style.display = "none";
-    };
-    menuTrigger.onclick = (e) => {
-        e.stopPropagation();
-        dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
-    };
-    document.addEventListener('click', () => {
-        dropdown.style.display = "none";
-    });
-    dropdown.appendChild(deleteBtn);
-    book.appendChild(dropdown);
+//     // Обработчики кликов
+//     deleteBtn.onclick = (e) => {
+//         e.stopPropagation();
+//         if (confirm("Are you sure you want to delete this book?")) {
+//             book.remove();
+//         }
+//         dropdown.style.display = "none";
+//     };
+//     menuTrigger.onclick = (e) => {
+//         e.stopPropagation();
+//         dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+//     };
+//     document.addEventListener('click', () => {
+//         dropdown.style.display = "none";
+//     });
+//     dropdown.appendChild(deleteBtn);
+//     book.appendChild(dropdown);
     
-    // book.onclick = () => openBookChatArea(bookData.id);
-    // Добавляем data-атрибут для идентификации ячейки (остальное не меняем)
-book.setAttribute('data-book-item', 'true');
+//     // book.onclick = () => openBookChatArea(bookData.id);
+//     // Добавляем data-атрибут для идентификации ячейки (остальное не меняем)
+// book.setAttribute('data-book-item', 'true');
 
-book.onclick = () => {
+// book.onclick = () => {
+//     // Сброс активных стилей для всех ячеек
+//     document.querySelectorAll('[data-book-item]').forEach(item => {
+//         applyStyles(item, styles.bookItem);
+//     });
+//     // Применяем активное выделение для нажатой ячейки
+//     applyStyles(book, {
+//         backgroundColor: '#e0f7fa',         // изменённый фон
+//         border: '1px solid #007BFF',         // выделенная граница
+//         boxShadow: '0 4px 12px rgba(0, 123, 255, 0.3)' // усиленная тень
+//     });
+//     // Вызываем функцию открытия книги
+//     openBookChatArea(bookData.id);
+// };
+
+    
+//     return book;
+// }
+
+
+
+// //api-Delete Book
+
+// Функция для вызова API удаления книги
+function deleteBook(bookId, bookElement) {
+  // Запускаем глобальный индикатор загрузки, если он определён
+  if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+    window.loadingIndicator.startLoading();
+  }
+
+  fetch('https://2l8918m1x7.execute-api.us-east-2.amazonaws.com/default/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+    },
+    body: JSON.stringify({ BookID: bookId })
+  })
+    .then(response => {
+      console.log("Received response with status:", response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(`Deletion API responded with status ${response.status}`);
+      }
+    })
+    .then(data => {
+      console.log("Deletion API response data:", data);
+      // Останавливаем индикатор загрузки, если он определён
+      if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+        window.loadingIndicator.stopLoading();
+      }
+      // Удаляем DOM-элемент книги из панели
+      bookElement.remove();
+    })
+    .catch(error => {
+      if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+        window.loadingIndicator.stopLoading();
+      }
+      console.error('Error deleting book:', error);
+      alert('Ошибка при удалении книги: ' + error.message);
+    });
+}
+
+// Функция для создания элемента книги с кнопкой удаления и вызовом API
+function createBookItem(bookData) {
+  const book = document.createElement("div");
+  applyStyles(book, styles.bookItem);
+  
+  const content = document.createElement("div");
+  applyStyles(content, styles.bookContent);
+  
+  // Верхняя строка с заголовком и метаданными
+  const topRow = document.createElement("div");
+  applyStyles(topRow, styles.topRow);
+  
+  const titleContainer = document.createElement("div");
+  applyStyles(titleContainer, styles.titleContainer);
+  
+  const title = document.createElement("div");
+  applyStyles(title, styles.title);
+  title.textContent = bookData.title;
+  
+  const metadata = document.createElement("div");
+  applyStyles(metadata, styles.metadata);
+  
+  const dateContainer = document.createElement("div");
+  applyStyles(dateContainer, styles.dateContainer);
+  
+  const date = document.createElement("div");
+  applyStyles(date, styles.date);
+  date.textContent = formatDate(bookData.CreateDate);
+  
+  const menuTrigger = document.createElement("div");
+  applyStyles(menuTrigger, styles.menuTrigger);
+  menuTrigger.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="color: #94a3b8">
+          <circle cx="8" cy="2" r="1.5"/>
+          <circle cx="8" cy="8" r="1.5"/>
+          <circle cx="8" cy="14" r="1.5"/>
+      </svg>
+  `;
+  
+  const dropdown = document.createElement("div");
+  applyStyles(dropdown, styles.dropdownMenu);
+  
+  const deleteBtn = document.createElement("div");
+  applyStyles(deleteBtn, styles.deleteButton);
+  deleteBtn.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+      </svg>
+      Delete Book
+  `;
+  
+  titleContainer.appendChild(title);
+  dateContainer.appendChild(date);
+  metadata.appendChild(dateContainer);
+  metadata.appendChild(menuTrigger);
+  
+  topRow.appendChild(titleContainer);
+  topRow.appendChild(metadata);
+  
+  content.appendChild(topRow);
+  
+  // Если есть статус книги, добавляем индикатор
+  const statusIndicator = createStatusIndicator(bookData.state);
+  if (statusIndicator) {
+    content.appendChild(statusIndicator);
+  }
+  
+  book.appendChild(content);
+  
+  // Hover эффекты
+  book.onmouseover = () => {
+    applyStyles(book, {
+      backgroundColor: '#f8fafc',
+      transform: 'translateX(5px)',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+    });
+  };
+  book.onmouseout = () => {
+    applyStyles(book, {
+      backgroundColor: 'white',
+      transform: 'none',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.02)'
+    });
+  };
+  menuTrigger.onmouseover = () => {
+    applyStyles(menuTrigger, { backgroundColor: '#f1f5f9' });
+  };
+  menuTrigger.onmouseout = () => {
+    applyStyles(menuTrigger, { backgroundColor: 'transparent' });
+  };
+  deleteBtn.onmouseover = () => {
+    applyStyles(deleteBtn, { backgroundColor: '#fef2f2' });
+  };
+  deleteBtn.onmouseout = () => {
+    applyStyles(deleteBtn, { backgroundColor: 'transparent' });
+  };
+  
+  // Обработчик клика по кнопке удаления
+  deleteBtn.onclick = (e) => {
+    e.stopPropagation();
+    if (confirm("Are you sure you want to delete this book?")) {
+      // Вызываем API для удаления книги с передачей идентификатора и DOM-элемента
+      deleteBook(bookData.id, book);
+    }
+    dropdown.style.display = "none";
+  };
+  
+  menuTrigger.onclick = (e) => {
+    e.stopPropagation();
+    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+  };
+  
+  document.addEventListener('click', () => {
+    dropdown.style.display = "none";
+  });
+  
+  dropdown.appendChild(deleteBtn);
+  book.appendChild(dropdown);
+  
+  // Добавляем data-атрибут для идентификации ячейки (остальное не меняем)
+  book.setAttribute('data-book-item', 'true');
+  
+  book.onclick = () => {
     // Сброс активных стилей для всех ячеек
     document.querySelectorAll('[data-book-item]').forEach(item => {
-        applyStyles(item, styles.bookItem);
+      applyStyles(item, styles.bookItem);
     });
     // Применяем активное выделение для нажатой ячейки
     applyStyles(book, {
-        backgroundColor: '#e0f7fa',         // изменённый фон
-        border: '1px solid #007BFF',         // выделенная граница
-        boxShadow: '0 4px 12px rgba(0, 123, 255, 0.3)' // усиленная тень
+      backgroundColor: '#e0f7fa',         // изменённый фон
+      border: '1px solid #007BFF',         // выделенная граница
+      boxShadow: '0 4px 12px rgba(0, 123, 255, 0.3)' // усиленная тень
     });
     // Вызываем функцию открытия книги
     openBookChatArea(bookData.id);
-};
-
-    
-    return book;
+  };
+  
+  return book;
 }
+
+
+
+
+
+
+
+
+
+
 
 // Функция обновления интерфейса на основе данных с сервера
 // function updateUI(data) { //???
@@ -1136,7 +1331,7 @@ function openChatBook(bookId) {
     .catch(error => {
         window.loadingIndicator.stopLoading();
         console.error("Ошибка API:", error);
-        document.getElementById("chat-area-container").innerHTML = "<p>Ошибка загрузки данных книги</p>"; //ИЗМЕНИТЬ ВИД ОШИБКИ НА БОЛЕЕ ЛУЧЬШЕ
+        document.getElementById("chat-area-container").innerHTML = "<p>Error loading book data</p>"; //ИЗМЕНИТЬ ВИД ОШИБКИ НА БОЛЕЕ ЛУЧЬШЕ
     });
 }
 
