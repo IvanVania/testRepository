@@ -25,7 +25,7 @@ function updateUI(data) {
     }
 
     // Print original array to terminal
-    printArray('ORIGINAL BOOKS ARRAY', data.books);
+    // printArray('ORIGINAL BOOKS ARRAY', data.books);
 
     const booksList = document.getElementById('books-list');
     booksList.innerHTML = '';
@@ -45,7 +45,7 @@ function updateUI(data) {
         );
 
         // Print sorted array to terminal
-        printArray('SORTED BOOKS ARRAY', sortedBooks);
+        // printArray('SORTED BOOKS ARRAY', sortedBooks);
 
         // Create cells from sorted array
         sortedBooks.forEach(book => {
@@ -131,7 +131,7 @@ window.onload = function () {
 
 function logout() {
     localStorage.removeItem('jwtToken');
-    window.location.href = 'https://ivanvania.github.io/testRepository/login/';
+    window.location.href = 'https://thedisc.xyz/login/';
 }
 
 
@@ -253,7 +253,7 @@ function createBuyCreditsButton() {
         buyCreditsBtn.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
     };
     
-    // При клике перенаправляем на страницу buy-credit
+    //  
     buyCreditsBtn.onclick = () => {
         window.location.href = "https://thedisc.xyz/buy-credit/";
     };
@@ -898,8 +898,8 @@ function updateUI(data) {
     }
 
     // 
-    console.log('=== ORIGINAL ARRAY ===');
-    console.table(data.books);
+    // console.log('=== ORIGINAL ARRAY ===');
+    // console.table(data.books);
 
     const booksList = document.getElementById('books-list');
     booksList.innerHTML = '';
@@ -910,8 +910,8 @@ function updateUI(data) {
         });
         
         //  
-        console.log('=== SORTED ARRAY ===');
-        console.table(sortedBooks);
+        // console.log('=== SORTED ARRAY ===');
+        // console.table(sortedBooks);
 
         sortedBooks.forEach(book => {
             const bookItem = createBookItem(book);
@@ -2116,14 +2116,14 @@ function createInputPanel3(messagesArea, bookData) {
   statusText.innerHTML = `Your book is being generated...<br>
         <span style="font-size: 14px; color: #64748b; font-weight: 400">
             
-        Average generation time 10-15 minutes
+        Average generation time 20-35 minutes. Time may change due to server overload.
         </span>`;
 
   panel.appendChild(progressContainer); // Estimated time: 35 minutes remaining
   panel.appendChild(statusText);
 
  
-  const duration = 5 * 60 * 1000; //  
+  const duration = 59 * 60 * 1000; //  
   let baseProgress = 0;
   let startTime = Date.now();
   let isFetching = false;
@@ -2295,7 +2295,7 @@ function createInputPanel4(messagesArea, bookData) {
     downloadBtn.style.background = "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)";
     downloadBtn.style.animation = "fadeIn 0.5s ease-out 0.2s backwards";
 
-    // Добавляем keyframes для анимаций
+    // 
     const keyframes = `
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -2787,18 +2787,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
