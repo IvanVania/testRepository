@@ -1661,10 +1661,16 @@ function renderText() {
 }
 
 /**
- * Инициализация WebSocket и обработка сообщений.
+ * Инициализация WebSocket с передачей токена в URL.
  */
 function initWebSocket() {
-  ws = new WebSocket("wss://gavxku789e.execute-api.us-east-2.amazonaws.com/prod");
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    console.error("❌ Токен отсутствует. Пользователь не аутентифицирован.");
+    return;
+  }
+
+  ws = new WebSocket(`wss://gavxku789e.execute-api.us-east-2.amazonaws.com/prod?auth=${encodeURIComponent(token)}`);
 
   ws.onopen = () => {
     console.log("✅ WebSocket подключен");
@@ -1690,6 +1696,7 @@ function initWebSocket() {
         }
       } else if (data.type === "error") {
         console.error("Ошибка:", data.message);
+        const messagesContainer = document.getElementById('chat-messages-area');
         messagesContainer.innerHTML = '<div style="color: red;">Ошибка. Попробуйте позже.</div>';
         isPlanCreationInProgress = false;
       }
@@ -1709,6 +1716,21 @@ function initWebSocket() {
 
 // Запуск WebSocket при загрузке страницы
 initWebSocket();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
