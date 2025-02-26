@@ -1489,10 +1489,115 @@ function createActionButtons(messagesArea, textarea) {
 
 let isPlanCreationInProgress = false;
 
+// function sendCreateBookPlan() {
+//   if (isPlanCreationInProgress) { 
+//     return;
+//   }
+//   isPlanCreationInProgress = true;
+
+//   const textarea = document.getElementById("chat-text-input");
+//   const wordNumberSelect = document.getElementById("word-count-selector");
+//   const requestText = textarea.value.trim();
+//   const wordNumber = parseInt(wordNumberSelect.value, 10);
+
+//   if (!requestText) { 
+//     isPlanCreationInProgress = false;
+//     return;
+//   }
+
+// //
+//             // addMessage(textarea.value); //???
+
+
+//   const payload = {
+//     RequestText: requestText,
+//     WordNumber: wordNumber
+//   }; 
+
+
+//   const messagesContainer = document.getElementById('chat-messages-area');
+//   messagesContainer.innerHTML = '';
+//   const spinner = document.createElement('div');
+//   spinner.className = 'loading-spinner';
+//   messagesContainer.appendChild(spinner);
+
+ 
+//   textarea.value = '';
+//   textarea.style.height = '100px';
+
+ 
+//   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') { 
+//     window.loadingIndicator.startLoading();
+//   }
+
+ 
+//   fetch('https://l71ibhfxdj.execute-api.us-east-2.amazonaws.com/default/', {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+//     },
+//     body: JSON.stringify(payload)
+//   })
+//     .then(response => { 
+//       if (response.status === 401) { 
+//         window.location.href = 'https://thedisc.xyz/login';
+//         throw new Error('Unauthorized');
+//       }
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`);
+//       }
+//       return response.json();
+//     })
+//     .then(data => { 
+//       messagesContainer.innerHTML = '';
+
+//       if (data.plan && data.bookId) {  
+//         addMessage(messagesContainer, data.plan);
+
+
+//         if (typeof addNewBookToListAndOpen === 'function') { 
+//           addNewBookToListAndOpen(data.title || 'New Book', data.bookId);
+//         } else {
+//           console.error("Function addNewBookToListAndOpen is not defined.");
+//         }
+
+ 
+//         const inputPanelContainer = document.getElementById('input-panel');
+//         if (inputPanelContainer && inputPanelContainer.parentNode) { 
+//           const newInputPanel = createInputPanel2(messagesContainer);
+//           inputPanelContainer.parentNode.replaceChild(newInputPanel, inputPanelContainer);
+//         } else { 
+//         }
+//       } else {
+//         console.error("Unexpected API response, missing plan or bookId:", data);
+//         // messagesContainer.innerHTML = `<div>An error occurred, sorry, try again another time</div>`;
+//         messagesContainer.innerHTML = '<div style="padding: 16px; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-family: Arial;">An error occurred, sorry, try again another time</div>';
+//       }
+//     })
+//     .catch(error => {
+//       console.error('API error:', error);
+//       // messagesContainer.innerHTML = `<div>An error occurred, sorry, try again another time</div>`;
+//       messagesContainer.innerHTML = '<div style="padding: 16px; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-family: Arial;">An error occurred, sorry, try again another time</div>';
+//     })
+//     .finally(() => {
+//       isPlanCreationInProgress = false;
+//       if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') { 
+//         window.loadingIndicator.stopLoading();
+//       }
+//     });
+// }
+
+//soker
+let ws;
+let isPlanCreationInProgress = false;
+let accumulatedText = "";
+
+/**
+ * Функция отправки запроса на создание книги через WebSocket.
+ */
 function sendCreateBookPlan() {
-  if (isPlanCreationInProgress) { 
-    return;
-  }
+  if (isPlanCreationInProgress) return;
   isPlanCreationInProgress = true;
 
   const textarea = document.getElementById("chat-text-input");
@@ -1500,94 +1605,110 @@ function sendCreateBookPlan() {
   const requestText = textarea.value.trim();
   const wordNumber = parseInt(wordNumberSelect.value, 10);
 
-  if (!requestText) { 
+  if (!requestText) {
     isPlanCreationInProgress = false;
     return;
   }
 
-//
-            // addMessage(textarea.value); //???
-
-
   const payload = {
+    action: "createBookPlan",
     RequestText: requestText,
     WordNumber: wordNumber
-  }; 
+  };
 
-
+  // Очистка экрана и запуск загрузки
   const messagesContainer = document.getElementById('chat-messages-area');
   messagesContainer.innerHTML = '';
   const spinner = document.createElement('div');
   spinner.className = 'loading-spinner';
   messagesContainer.appendChild(spinner);
 
- 
   textarea.value = '';
   textarea.style.height = '100px';
 
- 
-  if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') { 
+  if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
     window.loadingIndicator.startLoading();
   }
 
- 
-  fetch('https://l71ibhfxdj.execute-api.us-east-2.amazonaws.com/default/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
-    },
-    body: JSON.stringify(payload)
-  })
-    .then(response => { 
-      if (response.status === 401) { 
-        window.location.href = 'https://thedisc.xyz/login';
-        throw new Error('Unauthorized');
-      }
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => { 
-      messagesContainer.innerHTML = '';
-
-      if (data.plan && data.bookId) {  
-        addMessage(messagesContainer, data.plan);
-
-
-        if (typeof addNewBookToListAndOpen === 'function') { 
-          addNewBookToListAndOpen(data.title || 'New Book', data.bookId);
-        } else {
-          console.error("Function addNewBookToListAndOpen is not defined.");
-        }
-
- 
-        const inputPanelContainer = document.getElementById('input-panel');
-        if (inputPanelContainer && inputPanelContainer.parentNode) { 
-          const newInputPanel = createInputPanel2(messagesContainer);
-          inputPanelContainer.parentNode.replaceChild(newInputPanel, inputPanelContainer);
-        } else { 
-        }
-      } else {
-        console.error("Unexpected API response, missing plan or bookId:", data);
-        // messagesContainer.innerHTML = `<div>An error occurred, sorry, try again another time</div>`;
-        messagesContainer.innerHTML = '<div style="padding: 16px; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-family: Arial;">An error occurred, sorry, try again another time</div>';
-      }
-    })
-    .catch(error => {
-      console.error('API error:', error);
-      // messagesContainer.innerHTML = `<div>An error occurred, sorry, try again another time</div>`;
-      messagesContainer.innerHTML = '<div style="padding: 16px; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-family: Arial;">An error occurred, sorry, try again another time</div>';
-    })
-    .finally(() => {
-      isPlanCreationInProgress = false;
-      if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') { 
-        window.loadingIndicator.stopLoading();
-      }
-    });
+  // Отправка запроса через WebSocket
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(payload));
+    console.log("📤 Отправлен запрос на создание книги:", payload);
+  } else {
+    console.error("WebSocket не подключен!");
+    messagesContainer.innerHTML = '<div style="color: red;">WebSocket не подключен. Попробуйте позже.</div>';
+    isPlanCreationInProgress = false;
+  }
 }
 
+/**
+ * Функция обработки чанков текста, получаемых через WebSocket.
+ */
+function handleChunk(chunk) {
+  if (chunk && typeof chunk.content === "string") {
+    accumulatedText += chunk.content;
+    renderText();
+  }
+}
+
+/**
+ * Функция отрисовки текста в интерфейсе.
+ */
+function renderText() {
+  const messagesContainer = document.getElementById('chat-messages-area');
+  messagesContainer.textContent = accumulatedText;
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+/**
+ * Инициализация WebSocket и обработка сообщений.
+ */
+function initWebSocket() {
+  ws = new WebSocket("wss://gavxku789e.execute-api.us-east-2.amazonaws.com/prod");
+
+  ws.onopen = () => {
+    console.log("✅ WebSocket подключен");
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      console.log("📩 Получено сообщение:", data);
+
+      if (data.type === "chunk") {
+        handleChunk(data);
+      } else if (data.type === "done") {
+        isPlanCreationInProgress = false;
+
+        // Вызов после получения всех чанков
+        if (typeof addNewBookToListAndOpen === 'function') {
+          addNewBookToListAndOpen("New Book", "bookId-placeholder");
+        }
+
+        if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+          window.loadingIndicator.stopLoading();
+        }
+      } else if (data.type === "error") {
+        console.error("Ошибка:", data.message);
+        messagesContainer.innerHTML = '<div style="color: red;">Ошибка. Попробуйте позже.</div>';
+        isPlanCreationInProgress = false;
+      }
+    } catch (error) {
+      console.error("Ошибка обработки WebSocket-сообщения:", error);
+    }
+  };
+
+  ws.onerror = (error) => {
+    console.error("❌ Ошибка WebSocket:", error);
+  };
+
+  ws.onclose = () => {
+    console.log("🔻 WebSocket отключен");
+  };
+}
+
+// Запуск WebSocket при загрузке страницы
+initWebSocket();
 
 
 
