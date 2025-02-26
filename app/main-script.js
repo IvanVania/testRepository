@@ -1487,7 +1487,7 @@ function createActionButtons(messagesArea, textarea) {
 
 
 
-let isPlanCreationInProgress = false;
+// let isPlanCreationInProgress = false;
 
 // function sendCreateBookPlan() {
 //   if (isPlanCreationInProgress) { 
