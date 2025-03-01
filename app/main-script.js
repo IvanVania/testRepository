@@ -1589,12 +1589,142 @@ function createActionButtons(messagesArea, textarea) {
 // }
 
 //soker
+// let ws;
+// let isPlanCreationInProgress = false;
+// let accumulatedText = "";
+
+// /**
+//  * Функция отправки запроса на создание книги через WebSocket.
+//  */
+// function sendCreateBookPlan() {
+//   if (isPlanCreationInProgress) return;
+//   isPlanCreationInProgress = true;
+
+//   const textarea = document.getElementById("chat-text-input");
+//   const wordNumberSelect = document.getElementById("word-count-selector");
+//   const requestText = textarea.value.trim();
+//   const wordNumber = parseInt(wordNumberSelect.value, 10);
+
+//   if (!requestText) {
+//     isPlanCreationInProgress = false;
+//     return;
+//   }
+
+//   const payload = {
+//     action: "createBookPlan",
+//     RequestText: requestText,
+//     WordNumber: wordNumber
+//   };
+
+//   // Очистка экрана и запуск загрузки
+//   const messagesContainer = document.getElementById('chat-messages-area');
+//   messagesContainer.innerHTML = '';
+//   const spinner = document.createElement('div');
+//   spinner.className = 'loading-spinner';
+//   messagesContainer.appendChild(spinner);
+
+//   textarea.value = '';
+//   textarea.style.height = '100px';
+
+//   if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
+//     window.loadingIndicator.startLoading();
+//   }
+
+//   // Отправка запроса через WebSocket
+//   if (ws && ws.readyState === WebSocket.OPEN) {
+//     ws.send(JSON.stringify(payload));
+//     console.log("📤 Отправлен запрос на создание книги:", payload);
+//   } else {
+//     console.error("WebSocket не подключен!");
+//     messagesContainer.innerHTML = '<div style="color: red;">WebSocket не подключен. Попробуйте позже.</div>';
+//     isPlanCreationInProgress = false;
+//   }
+// }
+
+// /**
+//  * Функция обработки чанков текста, получаемых через WebSocket.
+//  */
+// function handleChunk(chunk) {
+//   if (chunk && typeof chunk.content === "string") {
+//     accumulatedText += chunk.content;
+//     renderText();
+//   }
+// }
+
+// /**
+//  * Функция отрисовки текста в интерфейсе.
+//  */
+// function renderText() {
+//   const messagesContainer = document.getElementById('chat-messages-area');
+//   messagesContainer.textContent = accumulatedText;
+//   messagesContainer.scrollTop = messagesContainer.scrollHeight;
+// }
+
+// /**
+//  * Инициализация WebSocket с передачей токена в URL.
+//  */
+// function initWebSocket() {
+//   const token = localStorage.getItem('jwtToken');
+//   if (!token) {
+//     console.error("❌ Токен отсутствует. Пользователь не аутентифицирован.");
+//     return;
+//   }
+
+//   ws = new WebSocket(`wss://gavxku789e.execute-api.us-east-2.amazonaws.com/prod?auth=${encodeURIComponent(token)}`);
+
+//   ws.onopen = () => {
+//     console.log("✅ WebSocket подключен");
+//   };
+
+//   ws.onmessage = (event) => {
+//     try {
+//       const data = JSON.parse(event.data);
+//       console.log("📩 Получено сообщение:", data);
+
+//       if (data.type === "chunk") {
+//         handleChunk(data);
+//       } else if (data.type === "done") {
+//         isPlanCreationInProgress = false;
+
+//         // Вызов после получения всех чанков
+//         if (typeof addNewBookToListAndOpen === 'function') {
+//           addNewBookToListAndOpen("New Book", "bookId-placeholder");
+//         }
+
+//         if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
+//           window.loadingIndicator.stopLoading();
+//         }
+//       } else if (data.type === "error") {
+//         console.error("Ошибка:", data.message);
+//         const messagesContainer = document.getElementById('chat-messages-area');
+//         messagesContainer.innerHTML = '<div style="color: red;">Ошибка. Попробуйте позже.</div>';
+//         isPlanCreationInProgress = false;
+//       }
+//     } catch (error) {
+//       console.error("Ошибка обработки WebSocket-сообщения:", error);
+//     }
+//   };
+
+//   ws.onerror = (error) => {
+//     console.error("❌ Ошибка WebSocket:", error);
+//   };
+
+//   ws.onclose = () => {
+//     console.log("🔻 WebSocket отключен");
+//   };
+// }
+
+// // Запуск WebSocket при загрузке страницы
+// initWebSocket();
+
+
 let ws;
 let isPlanCreationInProgress = false;
 let accumulatedText = "";
 
 /**
  * Функция отправки запроса на создание книги через WebSocket.
+ * Соединение устанавливается при нажатии кнопки, если оно ещё не установлено.
  */
 function sendCreateBookPlan() {
   if (isPlanCreationInProgress) return;
@@ -1610,112 +1740,128 @@ function sendCreateBookPlan() {
     return;
   }
 
+  // Сброс предыдущего накопленного текста и очистка окна сообщений
+  accumulatedText = "";
+  const messagesContainer = document.getElementById("chat-messages-area");
+  messagesContainer.innerHTML = "";
+  
+  if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === "function") {
+    window.loadingIndicator.startLoading();
+  }
+
+  // Если соединение не установлено, создать его при отправке запроса
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    const token = localStorage.getItem("jwtToken");
+    if (!token) {
+      console.error("❌ Токен отсутствует. Пользователь не аутентифицирован.");
+      isPlanCreationInProgress = false;
+      return;
+    }
+    ws = new WebSocket(`wss://gavxku789e.execute-api.us-east-2.amazonaws.com/prod?auth=${encodeURIComponent(token)}`);
+    ws.onopen = () => {
+      console.log("✅ WebSocket подключен");
+      sendPayload(requestText, wordNumber);
+    };
+    ws.onmessage = handleMessage;
+    ws.onerror = (error) => {
+      console.error("❌ Ошибка WebSocket:", error);
+    };
+    ws.onclose = () => {
+      console.log("🔻 WebSocket отключен");
+      ws = null;
+    };
+  } else {
+    // Если соединение уже установлено, просто отправляем запрос
+    sendPayload(requestText, wordNumber);
+  }
+  
+  textarea.value = "";
+  textarea.style.height = "100px";
+}
+
+/**
+ * Отправка полезной нагрузки через WebSocket.
+ */
+function sendPayload(requestText, wordNumber) {
   const payload = {
     action: "createBookPlan",
     RequestText: requestText,
     WordNumber: wordNumber
   };
+  ws.send(JSON.stringify(payload));
+  console.log("📤 Отправлен запрос на создание книги:", payload);
+}
 
-  // Очистка экрана и запуск загрузки
-  const messagesContainer = document.getElementById('chat-messages-area');
-  messagesContainer.innerHTML = '';
-  const spinner = document.createElement('div');
-  spinner.className = 'loading-spinner';
-  messagesContainer.appendChild(spinner);
+/**
+ * Обработка входящих сообщений от сервера.
+ */
+function handleMessage(event) {
+  try {
+    const data = JSON.parse(event.data);
+    console.log("📩 Получено сообщение:", data);
 
-  textarea.value = '';
-  textarea.style.height = '100px';
-
-  if (window.loadingIndicator && typeof window.loadingIndicator.startLoading === 'function') {
-    window.loadingIndicator.startLoading();
-  }
-
-  // Отправка запроса через WebSocket
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(payload));
-    console.log("📤 Отправлен запрос на создание книги:", payload);
-  } else {
-    console.error("WebSocket не подключен!");
-    messagesContainer.innerHTML = '<div style="color: red;">WebSocket не подключен. Попробуйте позже.</div>';
-    isPlanCreationInProgress = false;
+    if (data.type === "book_created") {
+      // При получении сообщения о создании книги сохраняем bookId и название
+      console.log("Новая книга создана. bookId:", data.bookId, "Название:", data.title);
+      if (typeof addNewBookToListAndOpen === "function") {
+        addNewBookToListAndOpen(data.title, data.bookId);
+      }
+    } else if (data.type === "chunk") {
+      handleChunk(data);
+    } else if (data.type === "done") {
+      isPlanCreationInProgress = false;
+      if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === "function") {
+        window.loadingIndicator.stopLoading();
+      }
+      // Закрываем соединение после завершения генерации
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    } else if (data.type === "error") {
+      console.error("Ошибка:", data.message);
+      document.getElementById("chat-messages-area").innerHTML = '<div style="color: red;">Ошибка. Попробуйте позже.</div>';
+      isPlanCreationInProgress = false;
+    }
+  } catch (error) {
+    console.error("Ошибка обработки WebSocket-сообщения:", error);
   }
 }
 
 /**
- * Функция обработки чанков текста, получаемых через WebSocket.
+ * Обработка чанков – они аккуратно накапливаются и рендерятся.
  */
 function handleChunk(chunk) {
   if (chunk && typeof chunk.content === "string") {
+    // Добавляем полученный контент в накопленный текст
     accumulatedText += chunk.content;
     renderText();
   }
 }
 
 /**
- * Функция отрисовки текста в интерфейсе.
+ * Отрисовка текста в области сообщений с сохранением форматирования.
  */
 function renderText() {
-  const messagesContainer = document.getElementById('chat-messages-area');
+  const messagesContainer = document.getElementById("chat-messages-area");
+  messagesContainer.style.whiteSpace = "pre-wrap"; // Сохраняем переносы строк и пробелы
   messagesContainer.textContent = accumulatedText;
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-/**
- * Инициализация WebSocket с передачей токена в URL.
- */
-function initWebSocket() {
-  const token = localStorage.getItem('jwtToken');
-  if (!token) {
-    console.error("❌ Токен отсутствует. Пользователь не аутентифицирован.");
-    return;
-  }
+// Запускаем WebSocket не при загрузке страницы, а при отправке запроса.
+// Функция initWebSocket() здесь не вызывается автоматически.
 
-  ws = new WebSocket(`wss://gavxku789e.execute-api.us-east-2.amazonaws.com/prod?auth=${encodeURIComponent(token)}`);
 
-  ws.onopen = () => {
-    console.log("✅ WebSocket подключен");
-  };
 
-  ws.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data);
-      console.log("📩 Получено сообщение:", data);
 
-      if (data.type === "chunk") {
-        handleChunk(data);
-      } else if (data.type === "done") {
-        isPlanCreationInProgress = false;
 
-        // Вызов после получения всех чанков
-        if (typeof addNewBookToListAndOpen === 'function') {
-          addNewBookToListAndOpen("New Book", "bookId-placeholder");
-        }
 
-        if (window.loadingIndicator && typeof window.loadingIndicator.stopLoading === 'function') {
-          window.loadingIndicator.stopLoading();
-        }
-      } else if (data.type === "error") {
-        console.error("Ошибка:", data.message);
-        const messagesContainer = document.getElementById('chat-messages-area');
-        messagesContainer.innerHTML = '<div style="color: red;">Ошибка. Попробуйте позже.</div>';
-        isPlanCreationInProgress = false;
-      }
-    } catch (error) {
-      console.error("Ошибка обработки WebSocket-сообщения:", error);
-    }
-  };
 
-  ws.onerror = (error) => {
-    console.error("❌ Ошибка WebSocket:", error);
-  };
 
-  ws.onclose = () => {
-    console.log("🔻 WebSocket отключен");
-  };
-}
 
-// Запуск WebSocket при загрузке страницы
-initWebSocket();
+
+
+
 
 
 
